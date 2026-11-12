@@ -1,0 +1,68 @@
+# AMY'S JOURNAL
+# To add an entry: copy one block, paste it at the top (under these notes), change the words.
+# Blocks are separated by a line with three dashes. Newest goes first.
+# Only "title" is required. Everything else is optional. Delete any line you don't need.
+#
+#   title:    the entry subject
+#   date:     shown exactly as you type it
+#   mood:     the little green mood tag
+#   music:    current music line
+#   tags:     shown as "filed under"
+#   image:    a picture in the img folder, like img/trails.png (skip it and the page makes a title card for you)
+#   image2:   a second picture
+#   video:    the name of a video from videos.txt, adds a "watch it move" link
+#   sticker:  short text on a colored label
+#   note:     tiny bracketed caption
+#   stamp:    round stamp text
+#   receipt:  receipt lines separated by " / "
+#   scratch:  prize text hidden under a scratch-off ticket
+#
+# Leave one blank line after the settings, then write. Blank lines make new paragraphs.
+
+---
+title: window trails
+date: 10 Nov 2026 | 11:41 pm
+mood: hypnotized
+music: CRT hum
+tags: loops, blender
+image: img/trails.png
+video: Window Trails
+sticker: 96 frames
+note: it never gets to finish
+stamp: loop approved
+
+Dragged a frozen window across the screen until it smeared everywhere. Then I made it loop in Blender.
+
+---
+title: the bodega is open 24 hours
+date: 28 Oct 2026 | 01:12 am
+mood: hungry
+music: fridge buzzing
+tags: toys, nyc, bodegas
+receipt: BODEGA / open 24hr, always / ------------------ / 1 bacon egg cheese / 1 arizona / 1 loosie (jk) / ------------------ / thank u come again
+scratch: one free bacon egg and cheese
+note: scratch it
+
+A bodega you can visit in your browser. Scratch the ticket.
+
+---
+title: my to-do list is an rpg now
+date: 3 Oct 2026 | 07:27 pm
+mood: leveling up
+tags: games, apps
+note: quest: drink water
+
+Pocket Quest. Goals are quests, finishing one gets you XP.
+
+---
+title: twelve monitors, one floppy
+date: 19 Sep 2026 | 10:05 pm
+mood: nostalgic
+music: floppy drive noises
+tags: loops, blender
+image: img/crt.png
+image2: img/floppy.png
+video: CRT Ritual
+sticker: insert disk 2
+
+Two more loops.

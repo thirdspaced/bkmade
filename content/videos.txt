@@ -1,0 +1,8 @@
+# VIDEOS
+# One video per line:  Title | path to the file in the v folder
+# Add a line to add a video. The order here is the order on the site.
+
+Window Trails | v/trails.mp4
+Disk 2 of Forever | v/floppy.mp4
+Cursor Cascade | v/cursors.mp4
+CRT Ritual | v/crt.mp4
