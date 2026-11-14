@@ -6,6 +6,7 @@
 - `img/`               pictures for diary entries
 - `v/`                 video files
 - `index.html`         the site itself (layout, colors, robot replies)
+- `escape/index.html`  Escape, the fire escape window, at bkmade.nyc/escape. The list of things the pigeon brings back and her timing are at the top of its script.
 
 ## Add a diary entry (no graphics needed)
 1. On GitHub, open `content/diary.txt` and click the pencil.
