@@ -11,6 +11,7 @@
 #   image:    a picture in the img folder, like img/trails.png (skip it and the page makes a title card for you)
 #   image2:   a second picture
 #   video:    the name of a video from videos.txt, adds a "watch it move" link
+#   link:     another page to open, like escape/ or a full https address, adds an "open it" link
 #   sticker:  short text on a colored label
 #   note:     tiny bracketed caption
 #   stamp:    round stamp text
@@ -18,6 +19,30 @@
 #   scratch:  prize text hidden under a scratch-off ticket
 #
 # Leave one blank line after the settings, then write. Blank lines make new paragraphs.
+
+---
+title: brooklyn bound
+date: 23 Nov 2026 | 04:47 pm
+mood: held momentarily
+tags: css, nyc, subway
+image: img/train.png
+link: brooklyn-bound/
+sticker: stand clear
+note: the train never moves
+
+A subway car that never moves. The buildings do.
+
+---
+title: the view from my window
+date: 14 Nov 2026 | 08:20 pm
+mood: nosy
+tags: pixel art, nyc, pigeons
+image: img/window.jpg
+link: escape/
+sticker: live
+note: real nyc time and weather
+
+A live feed of a Brooklyn fire escape. The pigeon brings stuff back.
 
 ---
 title: window trails

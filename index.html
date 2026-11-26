@@ -39,7 +39,7 @@ a{color:inherit}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;position:relative;z-index:3}
 .logo{font:900 27px/1 var(--mono);letter-spacing:-.02em;text-decoration:none;display:flex;align-items:baseline;gap:7px}
 .logo i{font:400 31px/1 var(--px2);font-style:normal;letter-spacing:0}
-.nav ul{display:flex;gap:clamp(8px,2.4vw,28px);list-style:none;margin:0;padding:0;font:13px var(--pixel);letter-spacing:.08em}
+.nav ul{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px clamp(8px,2.4vw,28px);list-style:none;margin:0;padding:0;font:13px var(--pixel);letter-spacing:.08em}
 .nav ul a,.nav ul button{background:none;border:0;padding:4px 0;text-decoration:none}
 .nav ul a:hover,.nav ul button:hover{background:var(--butter)}
 .band{flex:1;display:grid;place-items:center;position:relative}
@@ -90,6 +90,7 @@ a{color:inherit}
 .meta .mood{display:inline-block;background:var(--lime);padding:0 5px}
 .entry p{margin:0 0 10px;max-width:60ch}
 .e-foot{font-size:11px;color:var(--ultra)}
+.e-foot a{color:var(--pink)}
 .e-foot button{background:none;border:0;padding:0;text-decoration:underline;color:var(--pink);font:inherit}
 .e-text{transform:translate3d(calc(var(--mx,0)*-5px),calc(var(--my,0)*-4px),0);transition:transform .35s ease-out;min-width:0}
 .stage{--mx:0;--my:0;position:relative;height:clamp(300px,36vw,400px);perspective:900px;min-width:0}
@@ -232,6 +233,8 @@ footer button{background:none;border:0;padding:0;text-decoration:underline;color
     <ul>
       <li><a href="#diary">[DIARY]</a></li>
       <li><a href="#videos">[VIDEOS]</a></li>
+      <li><a href="escape/">[WINDOW]</a></li>
+      <li><a href="brooklyn-bound/">[TRAIN]</a></li>
       <li><button type="button" data-open-im>[IM ME]</button></li>
     </ul>
   </div>
@@ -511,11 +514,13 @@ const RULES=[
   [/amy|amanda|who made|owner|about/,()=>'amy made this. brooklyn kid, started on neopets html. she is away right now.'],
   [/diary|journal|blog|art|portfolio|work/,()=>'<a href="#diary">the diary is here.</a> move your mouse over the pictures.'],
   [/video|loop|music|player|amp|watch/,()=>'<a href="#videos">videos are here.</a> click a title and it loads in PLANETAMP.'],
+  [/window|escape|pigeon|fire escape/,()=>'<a href="escape/">the view from the window is here.</a> watch the pigeon.'],
+  [/train|subway|brooklyn bound/,()=>'<a href="brooklyn-bound/">the train is here.</a> stand clear of the closing doors.'],
   [/secret|easter|egg|hidden|cheat/,()=>'scroll all the way down. tiny blinking green pixel. u did not hear it from me.'],
   [/contact|email|hire|reach|talk to (her|amy)/,()=>CONTACT?('you can reach amy here: '+esc(CONTACT)):'no contact line yet. soon.'],
   [/brb|bye|gtg|g2g|cya|later/,()=>'ok bye!! ttyl'],
   [/lol|haha|lmao|rofl/,()=>pick(['lol','rofl'])],
-  [/help|what can (you|u) do|commands|\?$/,()=>'ask me about: the diary, the videos, amy, or a secret.'],
+  [/help|what can (you|u) do|commands|\?$/,()=>'ask me about: the diary, the videos, the window, the train, amy, or a secret.'],
   [/love|ily|<3/,()=>'omg. adding u to my top 8.']
 ];
 function reply(msg){const m=msg.toLowerCase().trim();for(const[r,f]of RULES)if(r.test(m))return f();
@@ -600,7 +605,7 @@ function renderDiary(list){const box=$('#entries');box.innerHTML='';
   list.forEach((e,i)=>{const a=document.createElement('article');a.className='entry';
     const vi=e.video?VIDEOS.findIndex((v,k)=>v.t.toLowerCase()===e.video.toLowerCase()||String(k+1)===e.video):-1;
     const meta=(e.mood?`<li><b>[mood |</b> <span class="mood">${esc(e.mood)}</span> <b>]</b></li>`:'')+(e.music?`<li><b>[music |</b> ${esc(e.music)} <b>]</b></li>`:'');
-    const foot=[e.tags?'filed under: '+esc(e.tags):'',vi>=0?'<button type="button">watch it move</button>':''].filter(Boolean).join(' | ');
+    const foot=[e.tags?'filed under: '+esc(e.tags):'',vi>=0?'<button type="button">watch it move</button>':'',e.link?`<a href="${esc(e.link)}">open it</a>`:''].filter(Boolean).join(' | ');
     a.innerHTML=`<div class="e-text"><div class="e-top"><h3>${esc(e.title)}</h3><time>${esc(e.date||'')}</time></div>${meta?`<ul class="meta">${meta}</ul>`:''}${e.body.map(p=>`<p>${rich(p).replace(/\n/g,'<br>')}</p>`).join('')}${foot?`<div class="e-foot">${foot}</div>`:''}</div><div class="stage${e.image||e.image2?'':' lite'}"><div class="tilt">${collage(e,i)}</div></div>`;
     box.appendChild(a);drift(a);a.querySelectorAll('.scratchc').forEach(scratch);
     const wb=a.querySelector('.e-foot button');if(wb)wb.addEventListener('click',ev=>load(vi,ev))});

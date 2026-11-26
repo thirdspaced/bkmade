@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A New York subway car that never moves. The buildings do.">
+<title>Brooklyn Bound</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=DM+Serif+Display:ital@0;1&display=swap">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<style>
+/* Layout: one still drawing of a subway car with see-through windows; three strips of Brooklyn slide behind it on a single keyframe; an LED line and one button underneath */
+:root{
+  --ultra:#100a88; --ultra-lit:#2a2fd0; --sky-top:#1c1fb4;
+  --steel:#eceef1; --steel-2:#cfd3d9; --concrete:#8d9299; --asphalt:#2b2d32; --ink:#141519;
+  --orange:#f58a1f; --orange-2:#f9a94b; --orange-deep:#c2600c;
+  --gold:#f8c300; --mta-blue:#0039a6;
+  --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:"DM Serif Display",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ink);color:var(--steel);font:16px/1.5 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1200px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;align-items:center;gap:12px}
+.bullet{flex:none;width:38px;height:38px;border-radius:50%;background:var(--ultra-lit);color:#fff;display:grid;place-items:center;font:800 22px/1 var(--sans)}
+h1{margin:0;font:800 clamp(22px,4.4vw,34px)/1 var(--sans);font-stretch:112%;letter-spacing:-.01em}
+header small{margin-left:auto;font:500 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--concrete);text-align:right}
+
+/* ---------- the car ---------- */
+.car{position:relative;overflow:hidden;aspect-ratio:1200/520;background:var(--ultra);border:3px solid var(--steel-2)}
+.stage{position:absolute;left:50%;top:0;width:1200px;height:520px;transform-origin:0 0;transform:translateX(calc(-600px*var(--s,1))) scale(var(--s,1))}
+.layer{position:absolute;inset:0;width:1200px;height:520px}
+.sky{position:absolute;left:0;top:104px;width:1200px;height:210px;background:linear-gradient(var(--sky-top),var(--ultra-lit) 78%,#5a63e6)}
+/* step 2 and 3: the strips sit behind the drawing, tile on repeat-x, and one keyframe slides them a tile to the left */
+.strip{position:absolute;left:0;top:104px;width:1200px;height:210px;background-repeat:repeat-x;background-position:0 0;background-size:var(--w) 210px;
+  animation:ride var(--dur) linear infinite;animation-play-state:paused}
+@keyframes ride{to{background-position-x:calc(-1*var(--w))}}
+/* step 4: paused until the car gets one class */
+.car.scrolling .strip{animation-play-state:running}
+/* step 5: the passenger waits on her own layer */
+.passenger{opacity:0;transition:opacity .8s ease;pointer-events:none}
+.car.revealed .passenger{opacity:1}
+
+.ad-slot{position:absolute;top:54px;width:154px;height:58px;background:var(--steel);overflow:hidden;outline:2px solid var(--ultra)}
+.ad{position:absolute;inset:0;padding:5px 8px;display:flex;flex-direction:column;justify-content:center;gap:2px;font:800 10px/1.04 var(--sans);text-transform:uppercase;letter-spacing:.01em;opacity:0;transition:opacity .9s ease}
+.ad.on{opacity:1}
+.ad b{font-weight:900;font-stretch:80%}
+.ad small{font:600 6.5px/1.15 var(--sans);letter-spacing:.06em}
+.a-hall{background:var(--ultra);color:#fff;text-align:center}
+.a-hall i{font:italic 400 17px/1 var(--serif);text-transform:none;color:var(--orange-2)}
+.a-hall b{font-size:8.5px}
+.a-skin{background:#fff;color:var(--ultra);padding-left:50px;font-size:9px}
+.a-skin::before{content:"";position:absolute;left:-14px;bottom:-30px;width:60px;height:60px;border-radius:50%;border:6px solid var(--orange);box-shadow:0 0 0 6px var(--ultra-lit),0 0 0 12px var(--concrete),0 0 0 18px var(--orange-2)}
+.a-law{background:var(--orange);color:var(--ink)}
+.a-law b{font-size:23px;line-height:.9}
+.a-see{background:var(--ink);color:#fff}
+.a-see b{font-size:13px}.a-see em{font-style:normal;color:var(--orange)}
+.a-poem{background:var(--steel);color:var(--ink);text-transform:none}
+.a-poem small{color:var(--ultra-lit);text-transform:uppercase}
+.a-poem i{font:italic 400 13px/1.08 var(--serif)}
+.a-dec{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 4px var(--orange)}
+.a-dec b{font-size:17px;color:var(--ultra)}
+.a-dec small{text-transform:none;font-size:7.5px;letter-spacing:0}
+.a-miss{background:var(--ultra-lit);color:#fff}
+.a-miss b{font-size:14px;color:var(--orange-2)}
+.a-miss small{text-transform:none;font-size:7.5px;letter-spacing:0}
+.a-dude{background:var(--concrete);color:var(--ink)}
+.a-dude b{font-size:14px}
+.a-store{background:var(--ink);color:var(--orange)}
+.a-store b{font-size:11.5px}.a-store small{color:var(--steel-2)}
+.a-show{background:var(--orange-2);color:var(--ultra)}
+.a-show b{font-size:15px}
+
+/* ---------- under the car ---------- */
+.led{background:#0a0a0c;border:3px solid var(--asphalt);padding:10px 14px;font:700 clamp(13px,2.6vw,18px)/1.25 "Courier New",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);min-height:3.4em;display:flex;align-items:center}
+.row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.go{font:800 15px/1 var(--sans);font-stretch:105%;letter-spacing:.02em;color:var(--ink);background:var(--orange);border:0;padding:14px 18px;cursor:pointer;box-shadow:4px 4px 0 var(--ultra-lit)}
+.go:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ultra-lit)}
+.go:focus-visible{outline:2px dashed var(--steel);outline-offset:3px}
+.note{margin:0;max-width:60ch;font-size:14px;color:var(--steel-2)}
+.note b{color:#fff}
+.note a{color:var(--orange-2)}
+
+@media (max-width:720px){.car{aspect-ratio:10/11}header small{display:none}}
+@media (prefers-reduced-motion:reduce){.passenger,.ad{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header><span class="bullet" aria-hidden="true">A</span><h1>Brooklyn Bound</h1><small>the trick to a moving train<br>is to not move the train</small></header>
+
+  <div class="car" id="car" role="img" aria-label="Inside a New York subway car: orange bucket seats under wide windows, ad cards overhead, a passenger dozing in a hoodie, and one dropped MetroCard on the floor. Brooklyn rooftops slide past outside.">
+    <div class="stage" id="stage">
+      <div class="sky"></div>
+      <div class="strip" id="s-far" style="--w:1600px;--dur:90s"></div>
+      <div class="strip" id="s-near" style="--w:2800px;--dur:24s"></div>
+      <div class="strip" id="s-post" style="--w:460px;--dur:1.7s"></div>
+      <svg class="layer" id="interior" viewBox="0 0 1200 520" aria-hidden="true"></svg>
+      <div id="ads"></div>
+      <svg class="layer passenger" id="passenger" viewBox="0 0 1200 520" aria-hidden="true"></svg>
+      <svg class="layer" id="front" viewBox="0 0 1200 520" aria-hidden="true"></svg>
+    </div>
+  </div>
+
+  <div class="led" id="led" aria-live="polite">We are being held momentarily by the train's dispatcher.</div>
+  <div class="row">
+    <button class="go" id="go" type="button">Stand clear of the closing doors</button>
+    <p class="note"><b>The car is one still drawing with holes for windows.</b> Behind it, three strips of Brooklyn tile sideways and slide on a single CSS keyframe. Technique from @elaineyustudio. <a href="/">Back to bkmade.nyc</a></p>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const U='#100a88',UL='#2a2fd0',ST='#eceef1',S2='#cfd3d9',CO='#8d9299',AS='#2b2d32',OR='#f58a1f',O2='#f9a94b',OD='#c2600c';
+function seeded(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const svgUrl=(w,h,body)=>`url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`)}")`;
+
+/* ---------- step 1: draw the looping strips. Each one starts and ends on a building edge, so the seam never shows ---------- */
+function farStrip(W,H){const r=seeded(3);let x=0,s='';
+  while(x<W){let w=34+r()*70|0;if(W-x-w<40)w=W-x;const h=40+r()*120|0;s+=`<rect x="${x}" y="${H-h}" width="${w}" height="${h}" fill="#3138cc"/>`;
+    if(r()<.3)s+=`<rect x="${x+w/2-1}" y="${H-h-18}" width="2" height="18" fill="#3138cc"/>`;
+    for(let y=H-h+8;y<H-6;y+=11)for(let i=x+5;i<x+w-6;i+=9)if(r()<.3)s+=`<rect x="${i}" y="${y}" width="4" height="5" fill="${r()<.25?O2:'#4d56e2'}"/>`;x+=w}
+  for(let i=0;i<5;i++){const cx=r()*W,cy=14+r()*40;s+=`<path d="M${cx} ${cy}h70a12 12 0 0 0 -22 -10a16 16 0 0 0 -30 2a10 10 0 0 0 -18 8z" fill="none" stroke="#aeb6ff" stroke-width="2"/>`}
+  return svgUrl(W,H,s)}
+function nearStrip(W,H){const r=seeded(19),pick=a=>a[r()*a.length|0];let x=0,s='';const signs=['DELI GROCERY','LAUNDROMAT','CASH ONLY','PIZZA','BAGELS','BARBER','BOTANICA','WE BUY GOLD'];
+  while(x<W){let w=96+r()*110|0;if(W-x-w<96)w=W-x;const h=84+r()*84|0,y=H-h,g=pick(['#d7dade','#b9bec5','#9a9fa7','#c8c2bb','#a8a39c']);
+    s+=`<rect x="${x+1}" y="${y}" width="${w-2}" height="${h}" fill="${g}" stroke="${U}" stroke-width="2.5"/><rect x="${x-2}" y="${y-5}" width="${w+4}" height="8" fill="${ST}" stroke="${U}" stroke-width="2"/>`;
+    const cols=Math.max(2,(w-18)/30|0),gap=(w-cols*16)/(cols+1);
+    for(let yy=y+16;yy<H-14;yy+=36)for(let c=0;c<cols;c++){const wx=x+gap+c*(16+gap);s+=`<rect x="${wx}" y="${yy}" width="16" height="24" fill="${r()<.14?OR:r()<.5?U:'#3b41c4'}" stroke="${U}" stroke-width="1.5"/><path d="M${wx-2} ${yy+25}h20M${wx} ${yy+12}h16" stroke="${ST}" stroke-width="1.5"/>`}
+    if(r()<.45){const fx=x+gap-5,fw=16+gap+10;for(let yy=y+40;yy<H;yy+=36)s+=`<path d="M${fx} ${yy+2}h${fw}M${fx} ${yy-9}v11M${fx+fw} ${yy-9}v11M${fx} ${yy-9}h${fw}M${fx+4} ${yy+2}l${fw-8} 25" fill="none" stroke="${AS}" stroke-width="2"/>`}
+    const t=r();
+    if(t<.36){const tx=x+18+r()*(w-60);s+=`<path d="M${tx+3} ${y-6}v-16M${tx+25} ${y-6}v-16M${tx+3} ${y-12}l22 -8" stroke="${AS}" stroke-width="2"/><rect x="${tx}" y="${y-48}" width="28" height="28" fill="#8a7a6c" stroke="${U}" stroke-width="2"/><path d="M${tx-2} ${y-48}l16 -13l16 13z" fill="${CO}" stroke="${U}" stroke-width="2"/><path d="M${tx} ${y-38}h28M${tx} ${y-29}h28" stroke="${U}" stroke-width="1.2"/>`}
+    else if(t<.58){const bw=Math.min(w-14,104),bx=x+(w-bw)/2,lab=pick(signs);s+=`<path d="M${bx+10} ${y-5}v-10M${bx+bw-10} ${y-5}v-10" stroke="${AS}" stroke-width="3"/><rect x="${bx}" y="${y-42}" width="${bw}" height="28" fill="${r()<.5?OR:'#fff'}" stroke="${U}" stroke-width="2.5"/><text x="${bx+bw/2}" y="${y-23}" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="${lab.length>9?10:13}" fill="${U}">${lab}</text>`}
+    else if(t<.78)s+=`<rect x="${x+w*.6}" y="${y-22}" width="14" height="18" fill="${CO}" stroke="${U}" stroke-width="2"/><path d="M${x+18} ${y-5}v-26M${x+12} ${y-25}h12M${x+14} ${y-19}h8" stroke="${AS}" stroke-width="2"/>`;
+    x+=w}
+  return svgUrl(W,H,s)}
+function postStrip(W,H){return svgUrl(W,H,`<rect x="0" y="0" width="12" height="${H}" fill="#1a1b20"/><rect x="12" y="0" width="3" height="${H}" fill="#4a4d55"/><path d="M0 ${H-34}H${W}" stroke="#1a1b20" stroke-width="5"/><path d="M0 ${H-22}H${W}" stroke="#4a4d55" stroke-width="2"/>`)}
+$('#s-far').style.backgroundImage=farStrip(1600,210);
+$('#s-near').style.backgroundImage=nearStrip(2800,210);
+$('#s-post').style.backgroundImage=postStrip(460,210);
+
+/* ---------- the one still drawing: a subway car with holes where the glass goes ---------- */
+const rr=(x,y,w,h,r)=>`M${x+r} ${y}h${w-2*r}a${r} ${r} 0 0 1 ${r} ${r}v${h-2*r}a${r} ${r} 0 0 1 -${r} ${r}h-${w-2*r}a${r} ${r} 0 0 1 -${r} -${r}v-${h-2*r}a${r} ${r} 0 0 1 ${r} -${r}z`;
+const HOLES=[[62,124,60,160],[128,124,60,160],[1012,124,60,160],[1078,124,60,160],[262,128,208,150],[496,128,208,150],[730,128,208,150]];
+let I=`<path fill-rule="evenodd" fill="${ST}" d="M0 0H1200V520H0Z ${HOLES.map(h=>rr(...h,12)).join(' ')}"/>`;
+I+=`<rect x="0" y="0" width="1200" height="46" fill="${S2}"/><rect x="150" y="14" width="900" height="11" rx="5" fill="#fff" stroke="${U}" stroke-width="2"/><path d="M0 46H1200" stroke="${U}" stroke-width="2.5"/>`;
+HOLES.forEach(h=>{I+=`<path d="${rr(h[0]-4,h[1]-4,h[2]+8,h[3]+8,15)}" fill="none" stroke="${CO}" stroke-width="7"/><path d="${rr(...h,12)}" fill="none" stroke="${U}" stroke-width="2.5"/>`});
+for(const dx of[40,990]){I+=`<rect x="${dx}" y="104" width="170" height="316" fill="none" stroke="${U}" stroke-width="2.5"/><path d="M${dx+85} 104V420" stroke="${U}" stroke-width="5"/><path d="M${dx+85} 104V420" stroke="${AS}" stroke-width="2"/>`;
+  for(const lx of[dx+30,dx+96])I+=`<rect x="${lx}" y="300" width="44" height="22" fill="#fff" stroke="${U}" stroke-width="1.5"/><text x="${lx+22}" y="309" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="5.5" fill="${OD}">DO NOT LEAN</text><text x="${lx+22}" y="317" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="5.5" fill="${OD}">ON DOOR</text>`}
+/* strip map over the left door, LED sign over the right */
+I+=`<rect x="48" y="58" width="154" height="36" fill="#fff" stroke="${U}" stroke-width="2"/><path d="M60 76H190" stroke="${UL}" stroke-width="4"/>`;
+for(let i=0;i<8;i++)I+=`<circle cx="${62+i*18}" cy="76" r="4" fill="${i===5?OR:'#fff'}" stroke="${U}" stroke-width="1.5"/>`;
+I+=`<rect x="998" y="58" width="154" height="36" fill="#0a0a0c" stroke="${U}" stroke-width="2"/><circle cx="1016" cy="76" r="10" fill="${UL}"/><text x="1016" y="80.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="13" fill="#fff">A</text><text x="1032" y="80" font-family="Courier New,monospace" font-weight="700" font-size="11" fill="${OR}">FAR ROCKAWAY</text>`;
+I+=`<rect x="238" y="48" width="724" height="70" fill="${S2}" stroke="${U}" stroke-width="2"/>`;
+/* grab bar */
+I+=`<path d="M232 121H968" stroke="${U}" stroke-width="8" stroke-linecap="round"/><path d="M232 121H968" stroke="#f7f8f9" stroke-width="4.5" stroke-linecap="round"/>`;
+/* bench: seven orange bucket seats */
+I+=`<rect x="236" y="250" width="14" height="170" fill="${S2}" stroke="${U}" stroke-width="2.5"/><rect x="950" y="250" width="14" height="170" fill="${S2}" stroke="${U}" stroke-width="2.5"/>`;
+for(let i=0;i<7;i++){const x=250+i*100,c=i%2?O2:OR;
+  I+=`<path d="M${x+6} 354V306a14 14 0 0 1 14 -14h60a14 14 0 0 1 14 14V354z" fill="${c}" stroke="${U}" stroke-width="2.5"/><path d="M${x+18} 304h64" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
+  I+=`<path d="M${x+2} 392V364a12 12 0 0 1 12 -12h72a12 12 0 0 1 12 12V392z" fill="${c}" stroke="${U}" stroke-width="2.5"/><path d="M${x+14} 384h72" stroke="${OD}" stroke-width="3" stroke-linecap="round" opacity=".6"/>`}
+I+=`<rect x="250" y="392" width="700" height="28" fill="#b6bac0" stroke="${U}" stroke-width="2.5"/>`;
+for(let x=262;x<940;x+=9)I+=`<path d="M${x} 400v12" stroke="${CO}" stroke-width="2"/>`;
+/* speckled floor */
+I+=`<rect x="0" y="420" width="1200" height="100" fill="${AS}"/><path d="M0 420H1200" stroke="${U}" stroke-width="3"/><path d="M0 428H1200" stroke="${OR}" stroke-width="3" opacity=".9"/>`;
+{const r=seeded(41);for(let i=0;i<420;i++)I+=`<rect x="${r()*1200|0}" y="${434+r()*84|0}" width="${1+r()*3|0}" height="${1+r()*2|0}" fill="${r()<.2?'#b9bec5':r()<.5?'#5a5d64':'#44474d'}"/>`}
+$('#interior').innerHTML=I;
+
+/* poles and the dropped card sit in front of everything */
+let F='';for(const x of[430,770])F+=`<rect x="${x-6}" y="46" width="12" height="446" fill="#f4f5f6" stroke="${U}" stroke-width="2"/><rect x="${x+1}" y="48" width="3" height="442" fill="${S2}"/><ellipse cx="${x}" cy="492" rx="15" ry="5" fill="${S2}" stroke="${U}" stroke-width="2"/>`;
+F+=`<g transform="translate(676 462) rotate(-9) skewX(-28)"><ellipse cx="34" cy="36" rx="38" ry="6" fill="#000" opacity=".35"/><rect width="62" height="34" rx="3.5" fill="#f8c300" stroke="#8a6500" stroke-width="1"/><rect width="62" height="11" rx="3.5" fill="#ffd94a" opacity=".7"/><g fill="#0039a6" transform="skewX(-14)"><rect x="13" y="10" width="16" height="9"/><rect x="31" y="12" width="5" height="7"/><rect x="38" y="10" width="4" height="9"/><rect x="44" y="12" width="5" height="7"/><rect x="51" y="12" width="9" height="7"/></g><rect x="5" y="25" width="30" height="2.5" fill="#0039a6" opacity=".8"/></g>`;
+$('#front').innerHTML=F;
+
+/* ---------- the passenger, on her own layer ---------- */
+const P=`
+<g stroke="${U}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M676 334h48v48a6 6 0 0 1 -6 6h-36a6 6 0 0 1 -6 -6z" fill="${S2}"/><path d="M686 334q14 -34 28 0" fill="none"/>
+  <path d="M570 252q-8 -52 30 -54q38 2 30 54l8 52q-38 12 -76 0z" fill="${U}"/>
+  <path d="M552 306q48 -24 96 0q16 44 10 88h-116q-6 -44 10 -88z" fill="#fff"/>
+  <path d="M552 306q-20 34 -8 66q22 12 40 0M648 306q20 34 8 66q-22 12 -40 0" fill="#fff"/>
+  <path d="M572 352h56l-8 26h-40z" fill="#fff"/>
+  <ellipse cx="600" cy="300" rx="28" ry="10" fill="#fff"/>
+  <path d="M592 308v26M608 308v22" fill="none"/>
+  <ellipse cx="600" cy="256" rx="25" ry="27" fill="#fff"/>
+  <path d="M575 252q0 -30 25 -30q25 0 25 30q-10 -16 -25 -13q-15 -3 -25 13z" fill="${U}"/>
+  <path d="M586 260q5 4 10 0M604 260q5 4 10 0M596 272q4 3 8 0" fill="none" stroke-width="2"/>
+  <path d="M572 250q28 -62 56 0" fill="none" stroke="${OD}" stroke-width="7"/><path d="M572 250q28 -62 56 0" fill="none" stroke="${OR}" stroke-width="4"/>
+  <rect x="564" y="242" width="13" height="26" rx="6" fill="${OR}"/><rect x="623" y="242" width="13" height="26" rx="6" fill="${OR}"/>
+  <rect x="564" y="374" width="32" height="28" rx="8" fill="${CO}"/><rect x="604" y="374" width="32" height="28" rx="8" fill="${CO}"/>
+  <rect x="566" y="394" width="28" height="64" rx="8" fill="${CO}"/><rect x="606" y="394" width="28" height="64" rx="8" fill="${CO}"/>
+  <path d="M560 470v-8a10 10 0 0 1 10 -10h18a10 10 0 0 1 10 10v8z" fill="#fff"/><path d="M602 470v-8a10 10 0 0 1 10 -10h18a10 10 0 0 1 10 10v8z" fill="#fff"/>
+  <path d="M566 463h26M608 463h26" stroke="${OR}" stroke-width="3"/>
+</g>
+<circle cx="584" cy="268" r="4.5" fill="${OR}" opacity=".55"/><circle cx="616" cy="268" r="4.5" fill="${OR}" opacity=".55"/>
+<text x="700" y="366" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="9" fill="${U}">bkmade</text>`;
+$('#passenger').innerHTML=P;
+
+/* ---------- ad cards overhead, rotating ---------- */
+const ADS=[
+ ['a-hall','<i>Grand Prospect Hall</i><b>We make your dreams come true!</b><small>Park Slope, Brooklyn</small>'],
+ ['a-skin','<b>Now you can have beautiful, clear skin!</b><small>Dr. Z, dermatologist</small>'],
+ ['a-law','<b>Injured?</b><small>You already know the number. You are singing it right now.</small>'],
+ ['a-see','<b>If you see something, <em>say something.</em></b>'],
+ ['a-poem','<small>Poetry in Motion</small><i>The train is not moving.<br>The buildings are.</i>'],
+ ['a-dec','<b>La Decisión</b><small>Cap. 214: Marisol todavía lo está pensando. Julio también.</small>'],
+ ['a-miss','<small>Meet Miss Subways</small><b>Amy, Brooklyn</b><small>Broke into computers with Neopets HTML at 8.</small>'],
+ ['a-dude','<b>Dude. Stop the spread, please.</b><small>It is a space issue.</small>'],
+ ['a-store','<b>Your closet is a studio apartment for your coats.</b><small>Mini storage, all five boroughs</small>'],
+ ['a-show','<b>What time is it? Showtime.</b><small>Hold the pole. Guard your coffee.</small>']
+];
+const slots=[262,444,604,784].map((x,i)=>{const el=document.createElement('div');el.className='ad-slot';el.style.left=x+'px';$('#ads').appendChild(el);
+  const a=document.createElement('div'),b=document.createElement('div');el.append(a,b);return{a,b,cur:i,flip:false}});
+const show=(layer,k)=>{layer.className='ad '+ADS[k][0]+' on';layer.innerHTML=ADS[k][1]};
+slots.forEach(s=>show(s.a,s.cur));let nextAd=4,turn=0;
+setInterval(()=>{const s=slots[turn++%4],inn=s.flip?s.a:s.b,out=s.flip?s.b:s.a;
+  while(slots.some(o=>o.cur===nextAd))nextAd=(nextAd+1)%ADS.length;
+  show(inn,nextAd);out.classList.remove('on');s.cur=nextAd;s.flip=!s.flip;nextAd=(nextAd+1)%ADS.length},2600);
+
+/* ---------- fit the drawing to its frame (on a phone it crops to the middle of the car) ---------- */
+const car=$('#car'),stage=$('#stage');
+const fit=()=>stage.style.setProperty('--s',Math.max(car.clientWidth/1200,car.clientHeight/520));
+new ResizeObserver(fit).observe(car);fit();
+
+/* ---------- one class starts the train, one class brings her in ---------- */
+const led=$('#led'),go=$('#go'),STOPS=['Jay St-MetroTech','Hoyt-Schermerhorn','Nostrand Av','Utica Av','Broadway Junction','Euclid Av','Rockaway Blvd'];let stop=0,stopT;
+function setRunning(on){car.classList.toggle('scrolling',on);if(on)car.classList.add('revealed');
+  go.textContent=on?'Hold the train':'Stand clear of the closing doors';clearInterval(stopT);
+  if(on){const say=()=>led.textContent=`This is a Brooklyn-bound A express train. The next stop is ${STOPS[stop++%STOPS.length]}.`;say();stopT=setInterval(say,14000)}
+  else led.textContent="We are being held momentarily by the train's dispatcher."}
+go.addEventListener('click',()=>setRunning(!car.classList.contains('scrolling')));
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setTimeout(()=>setRunning(true),1400);else car.classList.add('revealed');
+})();
+</script>
+</body>
+</html>
