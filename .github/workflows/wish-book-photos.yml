@@ -1,0 +1,39 @@
+name: Wish Book toy photos
+
+# Refreshes wish-book/photos.json from Amazon twice a day.
+# Amazon lets an Associate keep an image link for 24 hours at most, so the page ignores a file older than that.
+on:
+  schedule:
+    - cron: "17 5,17 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wish-book-photos
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch images and links from Amazon
+        env:
+          AMAZON_CREDENTIAL_ID: ${{ secrets.AMAZON_CREDENTIAL_ID }}
+          AMAZON_CREDENTIAL_SECRET: ${{ secrets.AMAZON_CREDENTIAL_SECRET }}
+          AMAZON_PARTNER_TAG: ${{ secrets.AMAZON_PARTNER_TAG }}
+        run: node wish-book/tools/amazon-photos.mjs
+      - name: Commit photos.json if it changed
+        run: |
+          if [ -n "$(git status --porcelain wish-book/photos.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add wish-book/photos.json
+            git commit -m "Refresh Wish Book toy photos from Amazon"
+            git push
+          fi

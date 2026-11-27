@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>The Big Wish Book 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Bowlby+One&family=EB+Garamond:ital,wght@1,500;1,700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a printed 1998 mail-order catalog lying on a tartan tablecloth. Fixed-size print pages
+   (600 x 780) scaled to fit, tiled with flat process-color panels, tiny condensed copy, dot-leader prices.
+   The only "software" on screen is the crayon palette, drawn as a late-90s paint program toolbox. */
+:root{
+  color-scheme: light;
+  --paper:#F3EFE2;
+  --ink:#14213A;
+  --cloth:#1D5A3C;
+  --cranberry:#8E1626;
+  --teal:#49B3AA;
+  --peri:#8CA8E0;
+  --slate:#AEC0D2;
+  --sale:#D4145A;
+  --chrome:#C3C3C3;
+  --copy:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:"EB Garamond",Garamond,"Times New Roman",serif;
+  --kid:"Bowlby One","Arial Black",Impact,sans-serif;
+  --ui:Tahoma,"MS Sans Serif",Geneva,Verdana,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background-color:var(--cloth);color:var(--ink);font-family:var(--copy);overflow:hidden;display:flex;
+  background-image:
+   repeating-linear-gradient(0deg,rgba(244,210,90,.5) 0 2px,transparent 2px 96px),
+   repeating-linear-gradient(90deg,rgba(244,210,90,.5) 0 2px,transparent 2px 96px),
+   repeating-linear-gradient(0deg,rgba(142,22,38,.62) 0 30px,transparent 30px 96px),
+   repeating-linear-gradient(90deg,rgba(142,22,38,.62) 0 30px,transparent 30px 96px);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #FFD400;outline-offset:2px}
+
+/* ---------- toolbox (paint program chrome) ---------- */
+#tools{flex:none;width:118px;background:var(--chrome);border:2px solid;border-color:#fff #555 #555 #fff;font-family:var(--ui);font-size:12px;color:#000;display:flex;flex-direction:column;gap:6px;padding:3px;overflow:auto;z-index:20}
+#tools h1{margin:0;background:#0A246A;color:#fff;font-size:12px;font-weight:bold;padding:4px 6px;letter-spacing:.3px}
+.grp{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.grp.c3{grid-template-columns:repeat(3,1fr)}
+.lbl{grid-column:1/-1;font-size:11px;padding:1px 2px 0}
+.tb{min-height:40px;background:var(--chrome);border:2px solid;border-color:#fff #555 #555 #fff;padding:2px;font-size:12px;font-weight:bold;display:grid;place-items:center;line-height:1.05}
+.tb:active,.tb[aria-pressed="true"]{border-color:#555 #fff #fff #555;background-color:#e2e2e2;background-image:repeating-conic-gradient(#fff 0 25%,#d4d4d4 0 50%);background-size:4px 4px}
+.tb.wide{grid-column:1/-1}
+.tb svg{width:22px;height:22px;display:block}
+.sw{min-height:30px;border:2px solid;border-color:#555 #fff #fff #555;background:var(--c);padding:0}
+.sw[aria-pressed="true"]{outline:3px solid #000;outline-offset:-1px;box-shadow:inset 0 0 0 2px #fff}
+.dot{display:block;border-radius:50%;background:#000}
+#wishBtn b{display:block;font-size:18px}
+body.bar{flex-direction:column-reverse}
+body.bar #tools{width:auto;flex-direction:row;align-items:stretch;overflow-x:auto;overflow-y:hidden;gap:8px}
+body.bar #tools h1{display:none}
+body.bar .grp{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:46px;grid-template-rows:40px}
+body.bar .grp.col{grid-template-rows:20px 20px;grid-auto-columns:30px}
+body.bar .lbl{display:none}
+body.bar .sw{min-height:0}
+body.bar .tb.wide{grid-column:auto}
+body.bar .tb{min-width:46px}
+
+/* ---------- stage + book ---------- */
+#stage{flex:1;position:relative;overflow:hidden;min-width:0;min-height:0}
+#book{position:absolute;left:0;top:0;width:1200px;height:780px;transform-origin:0 0;perspective:2600px;transition:transform .8s cubic-bezier(.22,.8,.2,1)}
+#stage.closed #book{animation:bob 5.5s ease-in-out infinite}
+@keyframes bob{50%{translate:0 -7px}}
+.leaf{position:absolute;left:600px;top:0;width:600px;height:780px;transform-origin:0 50%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform 1s cubic-bezier(.4,.05,.2,1);box-shadow:0 8px 14px rgba(0,0,0,.4)}
+.leaf.flipped{transform:rotateY(-180deg)}
+.leaf.turning{pointer-events:none}
+.leaf.flipped .face.front,.leaf:not(.flipped) .face.back{pointer-events:none}
+.face{position:absolute;inset:0;background:var(--paper);overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.face::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:8;background:linear-gradient(90deg,rgba(20,16,10,.26),rgba(20,16,10,0) 7%)}
+.face.back::after{background:linear-gradient(270deg,rgba(20,16,10,.26),rgba(20,16,10,0) 7%)}
+.leaf.turning .face::before{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(255,255,255,.25) 60%,rgba(0,0,0,.12));animation:sheen 1s ease-in-out}
+@keyframes sheen{0%,100%{opacity:0}50%{opacity:1}}
+canvas.ink{position:absolute;inset:0;width:100%;height:100%;z-index:5;mix-blend-mode:multiply;touch-action:none;cursor:crosshair}
+.fold{position:absolute;bottom:0;width:34px;height:34px;z-index:7;border:0;padding:0;background:linear-gradient(135deg,#e2dcc9 0 50%,rgba(0,0,0,.34) 50% 56%,rgba(29,90,60,.9) 56%)}
+.face.front .fold{right:0}
+.face.back .fold{left:0;transform:scaleX(-1)}
+.fold:active{width:44px;height:44px}
+.fold::before{content:"";position:absolute;inset:-12px}
+.arrow{position:absolute;top:50%;margin-top:-34px;width:40px;height:68px;z-index:15;background:var(--chrome);border:2px solid;border-color:#fff #555 #555 #fff;padding:0;display:grid;place-items:center}
+.arrow:active{border-color:#555 #fff #fff #555}
+.arrow i{width:0;height:0;border:11px solid transparent}
+#prev{left:4px}#prev i{border-right-color:#000;margin-left:-11px}
+#next{right:4px}#next i{border-left-color:#000;margin-right:-11px}
+.arrow[disabled]{opacity:.35}
+@media (max-width:560px){.arrow{display:none}}
+
+/* ---------- print pages ---------- */
+.pg{position:absolute;inset:0;padding:14px 14px 36px}
+.folio{position:absolute;bottom:11px;font-weight:300;font-size:13px;letter-spacing:.2px}
+.face.back .folio{left:44px}.face.front .folio{right:44px}
+.foot{position:absolute;bottom:13px;left:110px;right:110px;text-align:center;font-size:8.5px;font-stretch:80%;line-height:1.15;color:#3b4252}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(12,1fr);gap:4px;height:100%}
+.panel{position:relative;background:var(--bg);display:flex;flex-direction:column;gap:5px;padding:7px 8px 6px;min-width:0;min-height:0;overflow:hidden}
+.panel.wide{flex-direction:row;gap:10px}
+.panel.wide .copy{flex:0 0 46%;align-self:flex-end}
+.panel.wide.hero{flex-direction:column}
+.panel.wide.hero .copy{flex:none;align-self:stretch;columns:2;column-gap:12px}
+.sect{font-weight:250;font-stretch:100%;font-size:31px;line-height:.95;letter-spacing:-.6px;margin:0 0 1px}
+.sect small{display:block;font-size:10.5px;font-weight:500;font-stretch:80%;letter-spacing:0;line-height:1.15;margin-top:4px;max-width:36ch}
+.well{position:relative;flex:1;min-height:0;min-width:0;display:grid;place-items:center;background:rgba(255,255,255,.26);overflow:hidden}
+.well img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.well.fpo::before{content:"";position:absolute;inset:6px;border:1px solid rgba(20,33,58,.55);
+  background:linear-gradient(to top right,transparent calc(50% - .5px),rgba(20,33,58,.28) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px)),
+             linear-gradient(to bottom right,transparent calc(50% - .5px),rgba(20,33,58,.28) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px))}
+.fpo span.num{position:relative;background:var(--bg);padding:1px 8px 3px;font-weight:200;font-size:40px;line-height:1;letter-spacing:-1px}
+.fpo em{position:absolute;left:9px;bottom:8px;font-style:normal;font-size:8px;font-stretch:80%;text-transform:uppercase;letter-spacing:.8px}
+.fig{position:absolute;left:0;top:0;background:var(--ink);color:#fff;font-size:9.5px;font-weight:700;padding:1px 4px;z-index:2}
+.flag{position:absolute;right:0;top:0;background:var(--sale);color:#fff;font-weight:800;font-stretch:75%;font-size:11px;letter-spacing:.6px;padding:2px 6px;text-transform:uppercase;z-index:2}
+.copy{font-size:11.2px;line-height:1.17;font-stretch:76%;font-weight:450}
+.copy b{font-weight:800}
+.copy .sv{display:block;font-weight:800}
+.pl{display:flex;align-items:baseline;gap:3px;font-weight:700;margin-top:2px;break-inside:avoid}
+.pl i{flex:1;border-bottom:1.5px dotted currentColor;transform:translateY(-2px);min-width:8px}
+.face.arrive .panel{animation:rise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*45ms + .35s)}
+@keyframes rise{from{transform:translateY(10px);opacity:.35}}
+
+/* cover: 1986-style red catalog cover. Thin white masthead, green keyline, and inside the keyline a scrapbook page
+   where family prints and toy clippings are glued down together. */
+.cover{background:#C5202C;color:#FBF3E4;position:absolute;inset:0;cursor:pointer;--mx:0;--my:0;overflow:hidden;
+  background-image:linear-gradient(100deg,rgba(255,255,255,.07),transparent 18%,rgba(0,0,0,.06) 60%,transparent),repeating-linear-gradient(8deg,rgba(255,255,255,.035) 0 1px,transparent 1px 5px)}
+.cover .mast{position:absolute;left:0;right:0;top:30px;text-align:center;font-weight:250;font-size:27.5px;letter-spacing:-.3px;line-height:1;white-space:nowrap;z-index:2}
+.cover .mast svg{width:13px;height:16px;margin:0 9px -1px;display:inline-block}
+.cover .frame{position:absolute;left:28px;right:28px;top:76px;bottom:54px;border:2.5px solid #1F7A4D;background:#1E5B3F;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 4px),repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px)}
+.cover .free{position:absolute;right:30px;bottom:20px;font-weight:300;font-size:13px;z-index:2}
+.cover .stk{position:absolute;left:346px;top:90px;width:212px;z-index:12;background:#F4F3EE;color:#1a1a1a;border-radius:6px;padding:5px 24px 6px 6px;display:grid;grid-template-columns:1fr 1fr;text-align:center;
+  font-size:6.6px;font-weight:700;font-stretch:84%;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;transform:rotate(-1.5deg);box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.cover .stk div+div{border-left:1.5px solid #2A56B8}
+.cover .stk b{display:block;font-size:11.5px;font-weight:600;letter-spacing:0;margin-top:1px;text-transform:none}
+.cover .stk i{position:absolute;right:5px;top:50%;font-style:normal;color:#2A56B8;font-size:8.5px;font-weight:800;letter-spacing:0;text-transform:none;transform:translate(50%,-50%) rotate(-90deg);transform-origin:center;white-space:nowrap;right:13px}
+.lay{position:absolute;left:var(--x);top:var(--y);width:var(--w);margin:0;z-index:var(--z,1);
+  transform:translate(calc(var(--mx)*var(--d,6)*1px),calc(var(--my)*var(--d,6)*.8px)) rotate(var(--r,0deg));transition:transform .25s ease-out;animation:land .7s cubic-bezier(.2,.9,.25,1) backwards;animation-delay:calc(var(--n)*110ms + .15s)}
+@keyframes land{from{translate:0 -46px;scale:1.16;opacity:0}}
+.mat{filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.mat .card{position:relative;background:var(--mc);padding:var(--pad,12px)}
+.mat .card img{display:block;width:100%;height:auto;border-radius:3px}
+.mat .stitch{position:absolute;inset:4.5px;border:1.5px dashed var(--sc,rgba(251,243,228,.9));pointer-events:none}
+.mat figcaption,.mat .cap{font-family:"Reenie Beanie","Bradley Hand","Segoe Print",cursive;color:#1b3fa0;font-size:25px;line-height:.8;padding:7px 4px 0;text-align:center}
+.hole{display:grid;place-items:center;width:100%;aspect-ratio:3/2;background:rgba(255,255,255,.4);border:1px dashed rgba(20,33,58,.55);color:#14213A;font-size:10px;font-weight:700;font-stretch:80%;text-transform:uppercase;letter-spacing:.8px}
+.oval .hole{height:100%;aspect-ratio:auto;border-radius:50%}
+.oval .card{border-radius:50%;padding:13px;height:var(--h)}
+.oval .card img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.oval .stitch{border-radius:50%}
+.print{position:absolute;left:var(--x);top:var(--y);width:var(--w);margin:0;background:#FBFAF4;padding:6px;box-shadow:0 2px 3px rgba(0,0,0,.5);z-index:var(--z,1);
+  transform:translate(calc(var(--mx)*var(--d,6)*1px),calc(var(--my)*var(--d,6)*.8px)) rotate(var(--r));transition:transform .25s ease-out;animation:land .7s cubic-bezier(.2,.9,.25,1) backwards;animation-delay:calc(var(--n)*110ms + .15s)}
+.print img{display:block;width:100%;height:auto;border-radius:4px}
+.print figcaption{font-family:"Reenie Beanie","Bradley Hand","Segoe Print",cursive;color:#1b3fa0;font-size:25px;line-height:.8;padding:7px 4px 1px;text-align:center}
+.print::before{content:"";position:absolute;left:36%;top:-10px;width:62px;height:20px;background:rgba(244,228,160,.8);transform:rotate(-5deg)}
+.gel{font-family:"Reenie Beanie","Bradley Hand","Segoe Print",cursive;font-size:27px;line-height:.8;color:#FBF3E4;white-space:nowrap;width:auto}
+.snip{filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.snip .cut{background:#F7F4EA;padding:7px 7px 6px;color:var(--ink)}
+.snip .well{height:74px;flex:none;background:var(--bg)}
+.snip .fpo span.num{font-size:17px;font-weight:300;letter-spacing:0;padding:1px 5px 2px}
+.snip b{display:block;font-size:10px;font-stretch:76%;font-weight:800;line-height:1.05;margin-top:4px}
+.snip i{display:block;font-style:normal;font-size:10px;font-stretch:76%;font-weight:700;border-top:1.5px dotted currentColor;margin-top:3px;padding-top:1px;text-align:right}
+.cover svg.ring{position:absolute;overflow:visible;pointer-events:none;inset:-12px -10px;width:calc(100% + 20px);height:calc(100% + 24px)}
+.cover svg.ring path{fill:none;stroke:#D7263D;stroke-width:6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s 2.1s cubic-bezier(.5,0,.3,1) forwards;filter:url(#rough)}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cover .open{position:absolute;left:28px;bottom:12px;z-index:9}
+.cover .open button{background:#FBF3E4;color:#B01824;border:0;font-weight:800;font-stretch:112%;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;padding:9px 13px;animation:nudge 2.4s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(5px)}}
+body.photomode canvas.ink{pointer-events:none}
+body.photomode [data-ph]{outline:3px dashed var(--sale);outline-offset:-3px;cursor:pointer}
+.tb[hidden]{display:none}
+#photoMsg{font-size:11px;line-height:1.2;padding:0 2px;min-height:1em}
+
+/* inside front */
+.intro{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:auto 1fr auto;gap:4px;height:100%}
+.intro>div{padding:12px 13px}
+.intro h2{font-weight:250;font-size:33px;line-height:.95;letter-spacing:-.6px;margin:0 0 8px}
+.intro h3{font-weight:800;font-stretch:76%;font-size:13px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 5px}
+.intro p,.intro li{font-size:12.4px;line-height:1.24;font-stretch:80%;margin:0 0 6px}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:grid;grid-template-columns:22px 1fr;gap:7px;margin-bottom:8px}
+.steps i{font-style:normal;background:var(--ink);color:#fff;font-size:10px;font-weight:700;height:15px;display:grid;place-items:center;margin-top:1px}
+.belongs{grid-column:1/-1;background:var(--paper);border:1.5px solid var(--ink);padding:10px 14px 14px!important}
+.belongs .line{border-bottom:1.5px solid var(--ink);height:74px}
+.toc{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:3px;font-weight:600;margin-bottom:5px}
+.toc li i{flex:1;border-bottom:1.5px dotted currentColor;transform:translateY(-2px)}
+.coupon{border:2px dashed var(--ink);background:#F8E27A}
+.coupon li{list-style:none;display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(20,33,58,.4);padding:3px 0;margin:0;font-weight:600}
+.coupon ul{margin:0;padding:0}
+
+/* activity pages */
+.act{position:absolute;inset:0;padding:22px 26px 34px;display:flex;flex-direction:column;gap:10px;background:var(--abg,#F8E27A)}
+.act h2{font-family:var(--kid);font-weight:400;font-size:46px;line-height:.9;margin:0;letter-spacing:-.5px;color:var(--ink)}
+.act h2 span{color:var(--sale)}
+.act .dek{font-size:13.5px;font-stretch:84%;font-weight:600;line-height:1.22;margin:0;max-width:44ch}
+.act .sheet{flex:1;min-height:0;background:var(--paper);border:2.5px solid var(--ink);display:grid;place-items:center;padding:12px;position:relative}
+.act svg{max-width:100%;max-height:100%;display:block}
+.act .again{position:absolute;right:26px;top:24px;z-index:6;border:2px dashed var(--ink);background:var(--paper);font-weight:800;font-stretch:78%;font-size:12px;text-transform:uppercase;letter-spacing:.6px;padding:9px 10px}
+.ws{display:grid;grid-template-columns:repeat(11,1fr);width:100%;aspect-ratio:1;max-height:100%;font-weight:700;font-size:23px;font-stretch:100%}
+.ws span{display:grid;place-items:center}
+.words{display:flex;flex-wrap:wrap;gap:4px 16px;font-weight:800;font-stretch:80%;font-size:14px;letter-spacing:1px;margin:0;padding:0;list-style:none}
+
+/* order form */
+.order{position:absolute;inset:0;padding:18px 20px 28px;display:flex;flex-direction:column;gap:8px;-webkit-user-select:text;user-select:text}
+.order h2{font-weight:250;font-size:34px;line-height:.95;letter-spacing:-.6px;margin:0;display:flex;justify-content:space-between;align-items:baseline}
+.order h2 small{font-size:10px;font-weight:700;font-stretch:80%;letter-spacing:.6px;text-transform:uppercase}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.fields label{border:1.5px solid var(--ink);padding:3px 7px 5px;font-size:9px;font-weight:700;font-stretch:80%;text-transform:uppercase;letter-spacing:.6px;display:block}
+.fields input{display:block;width:100%;border:0;background:transparent;font-family:var(--serif);font-style:italic;font-size:23px;line-height:1.1;padding:0;color:#1F5FD0}
+.tablewrap{flex:1;min-height:0;overflow-y:auto;border:1.5px solid var(--ink);background:var(--paper)}
+table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;font-stretch:80%}
+th{position:sticky;top:0;background:var(--ink);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.6px;text-align:left;padding:4px 6px;font-weight:700}
+td{height:30px;padding:0 6px;border-right:1px solid rgba(20,33,58,.35);border-bottom:1px solid rgba(20,33,58,.35);font-weight:600;vertical-align:middle;line-height:1.05}
+td:last-child,th:last-child{border-right:0;text-align:right;white-space:nowrap}
+tr.sel td{background:#F8E27A}
+tbody tr{cursor:pointer}
+td.was{color:var(--sale);white-space:nowrap}
+.find{border:2px dashed var(--ink);padding:7px 9px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;font-stretch:80%;font-weight:600;min-height:52px}
+.find span{flex:1 1 150px;line-height:1.15}
+.find a,.obtn{background:var(--ink);color:#fff;text-decoration:none;font-weight:800;font-stretch:80%;font-size:12px;text-transform:uppercase;letter-spacing:.6px;padding:10px 11px;border:0}
+.sum{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:800;font-size:14px;font-stretch:80%}
+.sum output{font-weight:250;font-stretch:100%;font-size:26px;letter-spacing:-.5px}
+.fine{font-size:9.5px;font-stretch:80%;line-height:1.2;margin:0;color:#2b3345}
+#copyout{width:100%;height:70px;font-family:var(--ui);font-size:11px;display:none}
+.backc{position:absolute;inset:0;background:var(--cranberry);color:#F6ECD2;padding:46px 40px;display:flex;flex-direction:column;gap:14px;justify-content:flex-end;-webkit-user-select:text;user-select:text}
+.backc .key{position:absolute;inset:14px;border:1.5px solid #F6ECD2;pointer-events:none}
+.backc h2{font-family:var(--serif);font-style:italic;font-weight:700;font-size:60px;line-height:.9;margin:0 0 auto}
+.backc p{margin:0;font-size:12.5px;font-stretch:82%;line-height:1.3;max-width:50ch}
+.backc button{align-self:flex-start;background:transparent;border:1.5px solid #F6ECD2;color:#F6ECD2;font-weight:800;font-stretch:80%;font-size:12px;text-transform:uppercase;letter-spacing:.8px;padding:10px 12px;position:relative;z-index:2}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}
+  .cover svg.ring path{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3"/></filter></svg>
+<div id="tools" role="toolbar" aria-label="Crayon box">
+  <h1>Crayons</h1>
+  <div class="grp" id="toolGrp"><span class="lbl">Tool</span>
+    <button type="button" class="tb" data-tool="c" aria-pressed="true">Crayon</button>
+    <button type="button" class="tb" data-tool="m" aria-pressed="false">Marker</button>
+    <button type="button" class="tb" data-tool="s" aria-pressed="false">Stamp</button>
+    <button type="button" class="tb" data-tool="e" aria-pressed="false">Eraser</button>
+  </div>
+  <div class="grp c3 col" id="colors" role="group" aria-label="Colors"><span class="lbl">Color</span></div>
+  <div class="grp c3" id="sizes" role="group" aria-label="Tip size"><span class="lbl">Tip</span></div>
+  <div class="grp c3" id="stamps" role="group" aria-label="Stamp shape"><span class="lbl">Stamp</span></div>
+  <div class="grp">
+    <button type="button" class="tb" id="undoBtn">Undo</button>
+    <button type="button" class="tb" id="wipeBtn">Wipe page</button>
+  </div>
+  <div class="grp"><span class="lbl">Pages</span>
+    <button type="button" class="tb" id="prevBtn">Back</button>
+    <button type="button" class="tb" id="nextBtn">Next</button>
+    <button type="button" class="tb wide" id="viewBtn">1 page</button>
+    <button type="button" class="tb wide" id="wishBtn">Wishes<b id="count">0</b></button>
+    <button type="button" class="tb wide" id="photoBtn" aria-pressed="false" hidden>Add photos</button>
+    <span class="lbl" id="photoMsg" role="status"></span>
+  </div>
+</div>
+<div id="stage" class="closed">
+  <div id="book"></div>
+  <button type="button" class="arrow" id="prev" aria-label="Previous page"><i></i></button>
+  <button type="button" class="arrow" id="next" aria-label="Next page"><i></i></button>
+</div>
+
+<script>
+(function(){
+"use strict";
+var PW=600, PH=780, RES=1.5, FLIP=1000;
+/* ---------- catalog data: prices spotted Nov 26, 2026 ---------- */
+// PHOTOS maps an item number to an image file published beside this page, e.g. {101:"img/101.jpg"}.
+// Photos with a white background sit on the panel color like a catalog cutout.
+var PHOTOS={};
+var SECTIONS=[
+{id:"big",title:"The Big Ones",blurb:"The toys everybody is asking for this year. If it giggles, hatches, sings or lights up, it is on these two pages.",items:[
+ {n:"Tickle Me Elmo Giggle Max",nw:1,p:29.99,was:39.99,at:"Amazon, Target",age:"18 mo. and up",d:"Big plush Elmo cracks up when you tickle him. Elmo turns 30 this year."},
+ {n:"KPop Demon Hunters Rumi Singing Doll",nw:1,p:27,pl:"27.00 and up",at:"Walmart",d:"Rumi sings the hit song from the movie."},
+ {n:"Hatchin' Yoshi",nw:1,p:39.49,was:51.99,at:"Amazon",d:"From The Super Mario Galaxy Movie. Lowest price seen so far."},
+ {n:"Pikachu Puppetronic",nw:1,p:47.99,was:79.99,at:"Amazon",d:"A Pikachu puppet you bring to life with your own hand."},
+ {n:"Primal Hatch Megalodon Shark Egg",nw:1,p:34.99,was:49.99,at:"Amazon, Walmart",age:"5 and up",d:"Drop the egg in water, watch it change color and hatch a shark. Then do it again."},
+ {n:"Bluey Light and Surprise Heeler House",nw:1,p:199.99,at:"Macy's",age:"3 and up",d:"Five stories of Heeler house with lights, sounds and surprises."},
+ {n:"PAW Patrol Megasaurus Dino Vehicle",nw:1,p:49.99,at:"Target",age:"3 and up",d:"Press the button and a giant dinosaur pops up. Rocky drives."},
+ {n:"Cotton Candy Furby",p:37.49,was:64.99,at:"Amazon",d:"The fuzzy chatterbox your grown-ups had in the 90s, in cotton candy colors."},
+ {n:"Toy Story 5 Woody and Buzz Interactables",nw:1,p:44.99,was:68.99,at:"Amazon",d:"Woody and Buzz talk to each other."},
+ {n:"American Girl Disney Frozen Elsa",p:145,at:"Amazon",age:"6 and up",d:"18 in. Elsa doll with her braid and gown."},
+ {n:"Disney Minnie Roadster Ride-On",p:98,was:148,at:"Walmart",age:"3 and up",d:"6-volt ride-on car. Goes 2 miles per hour."},
+ {n:"Tamagotchi Paradise",p:44.97,at:"Walmart",age:"6 and up",d:"A pocket pet that grows up differently depending on how you care for it."}
+]},
+{id:"build",title:"Build + Invent",blurb:"For kids who take things apart to see how they work. Bricks, circuits, coasters, robots and one very real microscope.",items:[
+ {n:"LEGO Pokemon SMART Play Training House",nw:1,p:70,pl:"about 70.00",at:"Amazon",d:"Build a training house for Pikachu with smart bricks that react when you play."},
+ {n:"LEGO Star Wars Gingerbread AT-AT",p:49.49,was:59.99,at:"Amazon",d:"A walker made of gingerbread. Do not eat."},
+ {n:"LEGO Animal Crossing Blathers' Museum",p:47.99,was:79.99,at:"Amazon",d:"Build the museum. Fill it with fossils and fish."},
+ {n:"LEGO Make Your Own Movie Kit",p:23.31,at:"Walmart, Amazon",age:"8 and up",d:"Sets, props and backgrounds for your own stop-motion movies."},
+ {n:"LEGO Fortnite Supply Llama",p:24,was:40,at:"Amazon",d:"Build the loot llama."},
+ {n:"Magna-Tiles Stardust Set",p:21,pl:"about 21.00",at:"Amazon",age:"4 and up",d:"Sparkly magnetic tiles click into towers, rockets and castles."},
+ {n:"Snap Circuits",p:30,pl:"30.00 to 70.00",at:"Amazon",age:"8 and up",d:"Snap real electronics together to make lights, alarms and spinning fans."},
+ {n:"Space Rover Deluxe Coding Set",p:42,pl:"about 42.00",at:"Amazon",age:"5 and up",d:"Code a rover across Mars. No screen needed."},
+ {n:"K'NEX Marble Coaster Run",p:45,pl:"about 45.00",at:"Amazon",age:"8 and up",d:"Build a marble roller coaster and learn why it stays on the track."},
+ {n:"Smithsonian Microscope Kit",p:22,pl:"about 22.00",at:"Amazon",age:"8 and up",d:"See what hides in a leaf, a hair or a drop of pond water."},
+ {n:"CrunchLabs The Crunchinator",p:34.97,at:"Walmart",age:"8 and up",d:"A machine with swappable plates for crushing cans."},
+ {n:"Smartivity Robotic Mechanical Hand",p:30,pl:"about 30.00",at:"Amazon",age:"8 to 14",d:"Build a robot hand that grabs using water power."}
+]},
+{id:"make",title:"Make + Play",blurb:"Bracelets, slime, songs, stickers and bedtime stories. Mess level: medium to glorious.",items:[
+ {n:"Rainbow Loom Spin Studio",p:24.99,was:34.99,at:"Amazon",age:"6 and up",d:"Spin rubber bands into bracelets for everyone you know."},
+ {n:"Stickerbox",p:129.99,at:"Stickerbox",age:"5 and up",d:"Say your idea out loud. It prints a sticker to color in."},
+ {n:"VTech Kidi Star Rockstar Guitar",p:49.99,at:"Macy's",age:"5 and up",d:"Light-up strings teach you songs."},
+ {n:"Gui Gui Mega Slime Haul",p:29.99,at:"Target",age:"6 and up",d:"Five scented slimes with charms and mix-ins."},
+ {n:"Play-Doh Super Sizzlin' Kitchen",p:44.99,at:"Target",age:"3 and up",d:"A pretend kitchen where every meal is Play-Doh."},
+ {n:"Yoto Player",p:59.99,was:80,at:"Amazon",d:"Pop in a card for stories, music and podcasts. No screen."},
+ {n:"Little Tikes Story Dream Machine",p:24.99,was:54.99,at:"Amazon",d:"Projects storybooks on your bedroom wall at bedtime."},
+ {n:"Hot Wheels Barbie RC Corvette",p:28.49,was:59.99,at:"Amazon",d:"Remote control Corvette. Seats two dolls."}
+]},
+{id:"little",title:"Little Kids",blurb:"For the littlest brothers, sisters and cousins. Big pieces, soft edges, lots of songs.",items:[
+ {n:"Ms. Rachel My First Learning Farm",p:27.99,was:39.99,at:"Amazon, Target, Walmart",age:"1 to 3",d:"A farm full of animals, songs and first words."},
+ {n:"Melissa & Doug Cheery Lane House",p:27.99,was:34.99,at:"Target",age:"2 and up",d:"A dollhouse you stack and rearrange."},
+ {n:"Little People My Mario Adventure Playset",p:43.97,was:54.99,at:"Walmart",age:"18 mo. and up",d:"A chunky Mario world with game sounds."},
+ {n:"Tegu Magnetic Wooden Blocks",p:40,pl:"about 40.00",at:"Amazon",age:"1 to 3",d:"Wooden blocks with magnets hidden inside."},
+ {n:"Fisher-Price Classic Xylophone",p:11,was:22,at:"Amazon",d:"The rainbow pull-along xylophone."},
+ {n:"Melissa & Doug Flip Fish",p:16,was:27,at:"Amazon",d:"A soft fish with scales to flip, crinkle and squeak."},
+ {n:"Battat Take-Apart Roadster",p:15,pl:"about 15.00",at:"Amazon",age:"3 and up",d:"Take it apart and rebuild it with a toy drill."},
+ {n:"Target Toy Shopping Basket",p:9.99,at:"Target",age:"3 and up",d:"Pretend shopping with a basket, bag and play phone."}
+]},
+{id:"stuffers",title:"Stocking Stuffers",blurb:"Small enough for a stocking. Everything on this page is $25 or less.",items:[
+ {n:"Magic Jellykins Surprise Plush",p:9.99,was:12.99,at:"Amazon, Target",age:"5 and up",d:"Add water, shake the jar, meet your squishy friend."},
+ {n:"Miiloo Christmas Clip-On Plushie",nw:1,p:14.88,at:"Walmart",d:"Blind box. One of seven holiday pals."},
+ {n:"Grogu Tamagotchi",p:13.99,was:19.99,at:"Amazon",d:"Take care of a tiny green friend."},
+ {n:"Nerf Minecraft Diamond Pickaxe",p:13.79,was:22.99,at:"Amazon",d:"A pickaxe that is secretly a dart blaster."},
+ {n:"Doctor Doom Squishmallow",p:16.99,was:20,at:"Amazon",d:"The squishiest supervillain around."},
+ {n:"Hot Wheels Mario Kart 4-Pack",p:16.49,was:26,at:"Amazon",d:"Four karts, including Black Yoshi."},
+ {n:"KPop Demon Hunters Furblets",p:15,pl:"about 15.00",at:"Amazon",d:"Mini Furbys dressed as demon hunters."},
+ {n:"LEGO Ideas Vending Machine Puzzle",p:9.49,was:12.99,at:"Amazon",d:"A little puzzle you build from bricks."},
+ {n:"Peekimo Interactive Pet",p:24.99,at:"Amazon",age:"5 and up",d:"A tiny pet you wear on your bag."}
+]}
+];
+var SALES=[["Amazon","up to 50% off"],["Target","up to 50% off"],["Walmart","up to $30 off"],["LEGO","up to 40% off"],["Best Buy","up to 40% off"],["Disney Store","up to 50% off"]];
+// grid templates on a 6 x 12 grid: [colStart, colEnd, rowStart, rowEnd] (end exclusive)
+var T={
+ a6:[[1,5,1,6],[5,7,1,5],[5,7,5,10],[1,3,6,13],[3,5,6,10],[3,7,10,13]],
+ b6:[[3,7,1,6],[1,3,1,5],[1,3,5,10],[5,7,6,13],[3,5,6,10],[1,5,10,13]],
+ a8:[[1,5,1,4],[5,7,1,5],[1,3,4,8],[3,5,4,8],[5,7,5,9],[1,3,8,13],[3,5,8,13],[5,7,9,13]],
+ b8:[[3,7,1,4],[1,3,1,5],[3,5,4,8],[5,7,4,8],[1,3,5,9],[3,5,8,13],[5,7,8,13],[1,3,9,13]],
+ a9:[[1,3,1,6],[3,5,1,4],[5,7,1,5],[3,5,4,9],[5,7,5,9],[1,3,6,10],[1,3,10,13],[3,5,9,13],[5,7,9,13]]
+};
+var BGS=["var(--teal)","var(--peri)","var(--slate)","#8FD0C6","#B9B6DC","#7FB4E0"];
+var COLORS=[["Red","#D7263D"],["Orange","#F26A1B"],["Yellow","#F5C400"],["Green","#1E9E4A"],["Teal","#008E8C"],["Sky","#46B3E6"],["Blue","#1F5FD0"],["Purple","#7A3FC2"],["Pink","#F0569A"],["Brown","#8A5A2B"],["Gray","#8C8C8C"],["Black","#222222"]];
+var SIZES=[5,11,20];
+var SHAPES={
+ star:"M0,-1 L0.235,-0.324 L0.951,-0.309 L0.38,0.124 L0.588,0.809 L0,0.4 L-0.588,0.809 L-0.38,0.124 L-0.951,-0.309 L-0.235,-0.324 Z",
+ heart:"M0,0.9 C-1.5,-0.1 -0.9,-1.05 -0.45,-1.05 C-0.15,-1.05 0,-0.8 0,-0.62 C0,-0.8 0.15,-1.05 0.45,-1.05 C0.9,-1.05 1.5,-0.1 0,0.9 Z",
+ check:"M-0.95,0.05 L-0.6,-0.3 L-0.25,0.2 L0.65,-0.95 L1,-0.6 L-0.2,0.95 Z"
+};
+
+/* ---------- state ---------- */
+var KEY="wishbook26v2", S={strokes:{},name:"",dear:"Nana",seed:7,tool:"c",color:"#D7263D",size:11,shape:"star"};
+try{var raw=JSON.parse(localStorage.getItem(KEY)||"null"); if(raw&&typeof raw==="object"){for(var k in raw) S[k]=raw[k]; if(!S.strokes||typeof S.strokes!=="object") S.strokes={};}}catch(e){}
+var saveT; function save(){clearTimeout(saveT); saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},400)}
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function $(id){return document.getElementById(id)}
+function el(tag,cls,txt){var x=document.createElement(tag); if(cls) x.className=cls; if(txt!=null) x.textContent=txt; return x}
+function svgEl(tag,attrs){var x=document.createElementNS("http://www.w3.org/2000/svg",tag); for(var a in attrs) x.setAttribute(a,attrs[a]); return x}
+function cents(v){return v.toFixed(2)}
+function rng(seed){var a=seed>>>0||1; return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- page builders ---------- */
+var PAGES=[], ITEMS={}, itemNo=100;
+function addPage(build,opts){PAGES.push({build:build,draw:!(opts&&opts.nodraw)})}
+
+function pinked(w,h,t){ // pinking-shears zigzag around a w x h box
+  var p=[], x, y, i=0, d=t*.55;
+  for(x=0;x<=w;x+=t/2) p.push(x.toFixed(1)+"px "+((i++%2)?d:0).toFixed(1)+"px");
+  for(y=t/2;y<=h;y+=t/2) p.push((w-((i++%2)?d:0)).toFixed(1)+"px "+y.toFixed(1)+"px");
+  for(x=w-t/2;x>=0;x-=t/2) p.push(x.toFixed(1)+"px "+(h-((i++%2)?d:0)).toFixed(1)+"px");
+  for(y=h-t/2;y>0;y-=t/2) p.push(((i++%2)?d:0).toFixed(1)+"px "+y.toFixed(1)+"px");
+  return "polygon("+p.join(",")+")";
+}
+function scalloped(w,h,r){ // scallop-edge scissors: a row of half circles on every side
+  var p=[], nx=Math.round(w/(2*r)), ny=Math.round(h/(2*r)), rx=w/(2*nx), ry=h/(2*ny), k, a, s=6;
+  for(k=0;k<nx;k++) for(a=0;a<s;a++){var t=Math.PI*(1-a/s); p.push((rx*(2*k+1)+rx*Math.cos(t)).toFixed(1)+"px "+(r-r*Math.sin(t)).toFixed(1)+"px")}
+  for(k=0;k<ny;k++) for(a=0;a<s;a++){var t2=Math.PI*(a/s)-Math.PI/2; p.push((w-r+r*Math.cos(t2)).toFixed(1)+"px "+(ry*(2*k+1)+ry*Math.sin(t2)).toFixed(1)+"px")}
+  for(k=nx-1;k>=0;k--) for(a=0;a<s;a++){var t3=Math.PI*(a/s); p.push((rx*(2*k+1)+rx*Math.cos(t3)).toFixed(1)+"px "+(h-r+r*Math.sin(t3)).toFixed(1)+"px")}
+  for(k=ny-1;k>=0;k--) for(a=0;a<s;a++){var t4=Math.PI/2+Math.PI*(a/s); p.push((r+r*Math.cos(t4)).toFixed(1)+"px "+(ry*(2*k+1)+ry*Math.sin(t4)).toFixed(1)+"px")}
+  return "polygon("+p.join(",")+")";
+}
+function handcut(seed){ // a kid with scissors: a few straight, slightly-off cuts
+  var r=rng(seed), j=function(){return (r()*5).toFixed(1)+"%"};
+  return "polygon("+j()+" "+j()+", 46% "+(r()*3).toFixed(1)+"%, calc(100% - "+j()+") "+j()+", 100% 52%, calc(100% - "+j()+") calc(100% - "+j()+"), 54% 100%, "+j()+" calc(100% - "+j()+"), "+(r()*3).toFixed(1)+"% 48%)";
+}
+function buildCover(f){
+  var c=el("div","cover"), n=0, TREE='<svg viewBox="0 0 13 16" aria-hidden="true"><path d="M6.5 0 L10 5 H8.4 L11.6 9.4 H9.6 L13 14 H7.6 V16 H5.4 V14 H0 L3.4 9.4 H1.4 L4.6 5 H3 Z" fill="#1F7A4D"/></svg>';
+  c.id="cover";
+  c.innerHTML='<div class="mast">The Big Wish Book'+TREE+'Christmas'+TREE+'2026</div><div class="frame"></div>'+
+   '<div class="stk"><div>To place your wish order,<b>grab a crayon</b></div><div>To ask about your order,<b>call Nana</b></div><i>Wish Book</i></div><div class="free">Free</div>';
+  function lay(cls,x,y,w,r,d,z){var e=el(cls==="print"?"figure":"div",(cls==="print"?"":"lay ")+cls); e.style.cssText="--x:"+x+"px;--y:"+y+"px;--w:"+w+"px;--r:"+r+"deg;--d:"+d+";--z:"+z+";--n:"+(n++); c.appendChild(e); return e}
+  function photo(src,alt){var im=el("img"); im.alt=alt; im.draggable=false; im.addEventListener("error",function(){var h=el("div","hole","your photo here"); im.replaceWith(h)}); im.src=src; return im}
+  // a print glued to a cardstock mat, with pen "stitching" drawn around it. edge: pinked | scallop | plain
+  function mat(src,alt,ratio,x,y,w,r,d,z,color,edge,pad,cap,stitch){
+    var e=lay("mat",x,y,w,r,d,z), card=el("div","card"), h=Math.round((w-2*pad)*ratio)+2*pad+(cap?26:0);
+    card.style.cssText="--mc:"+color+";--pad:"+pad+"px;"+(stitch?"--sc:"+stitch+";":"");
+    if(edge==="pinked") card.style.clipPath=pinked(w,h,9); if(edge==="scallop") card.style.clipPath=scalloped(w,h,7);
+    card.appendChild(photo(src,alt)); if(cap) card.appendChild(el("div","cap",cap)); card.appendChild(el("div","stitch")); e.appendChild(card); return e;
+  }
+  mat("img/fam1.jpg","Christmas morning by the tree",.667,40,92,292,-3,5,2,"#B01824","pinked",13);
+  var ov=lay("mat oval",352,146,206,5,9,3), oc=el("div","card"); oc.style.cssText="--mc:#E0B53A;--h:160px;--sc:rgba(120,30,20,.75)"; oc.appendChild(photo("img/fam6.jpg","A baby under a tinsel tree with a toy train set")); oc.appendChild(el("div","stitch")); ov.appendChild(oc);
+  mat("img/fam2.jpg","The family opening presents",.531,252,326,304,2,4,3,"#F3E9D2","scallop",14,"","rgba(176,24,36,.8)");
+  var kids=lay("print",40,306,196,-5,7,5); kids.appendChild(photo("img/fam3.jpg","Four kids in holiday hats on the couch")); kids.appendChild(el("figcaption",null,"hats required"));
+  mat("img/fam4.jpg","Everyone around the holiday dinner table",.625,38,512,266,3,10,4,"#F3E9D2","pinked",12,"every single year","rgba(31,122,77,.9)");
+  mat("img/fam5.jpg","Opening presents on the couch",.561,318,540,240,-3,6,4,"#B01824","plain",11);
+  var g1=lay("gel",398,306,0,-4,6,7); g1.textContent="way back when"; g1.style.width="auto";
+  // toy clippings cut out of the catalog and glued in between the family prints.
+  // [photo key, name, price, x, y, rotation, panel color]. Keys that start with n share a photo with that catalog item.
+  [["c1","NeeDoh squishies","5.99 and up",246,214,6,"var(--teal)"],["n101","Tickle Me Elmo Giggle Max","29.99",196,452,4,"var(--peri)"],["n102","KPop Demon Hunters Rumi Singing Doll","27.00 and up",476,596,6,"var(--slate)"],
+   ["n113","LEGO Pokemon Training House","about 70.00",474,438,-5,"#8FD0C6"],["c5","Jellycat plush","prices vary",262,630,3,"#B9B6DC"]].forEach(function(t,i){
+    var s=lay("snip",t[3],t[4],98,t[5],13+i*2,8+i), cut=el("div","cut"), well=el("div","well"); cut.style.clipPath=handcut(41+i*17); well.style.setProperty("--bg",t[6]);
+    well.dataset.ph=t[0]; well.dataset.alt=t[1];
+    if(PHOTOS[t[0]]) well.appendChild(photo(PHOTOS[t[0]],t[1])); else{well.classList.add("fpo"); well.appendChild(el("span","num","photo"))}
+    cut.appendChild(well); cut.appendChild(el("b",null,t[1])); cut.appendChild(el("i",null,t[2])); s.appendChild(cut);
+    if(i===0) s.insertAdjacentHTML("beforeend",'<svg class="ring" viewBox="0 0 330 150" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M52 34 C120 2 262 6 302 58 C334 104 250 142 150 140 C60 138 6 112 22 66 C36 30 120 14 196 22"/></svg>');
+  });
+  var o=el("div","open"); o.innerHTML='<button type="button" id="openBtn">Open the book</button>'; c.appendChild(o);
+  f.appendChild(c);
+  c.addEventListener("click",function(){ if(!document.body.classList.contains("photomode")) go(1)});
+}
+function buildIntro(f){
+  var pg=el("div","pg"), w=el("div","intro");
+  var a=el("div"); a.style.background="var(--teal)";
+  a.innerHTML='<h2>How to use your Wish Book</h2><ol class="steps"><li><i>01</i><p><b>Pick a crayon</b> from the crayon box. Markers and stamps work too.</p></li><li><i>02</i><p><b>Draw right on the pages.</b> Circle a toy, check it, star it or scribble on it. Any mark on a toy puts it on your list.</p></li><li><i>03</i><p><b>Turn to the order form</b> at the back and hand the book to a grown-up.</p></li></ol><p>Changed your mind? Rub it out with the eraser. Turn pages with the folded corners.</p>';
+  var b=el("div"); b.style.background="var(--peri)"; b.innerHTML='<h3>In this book</h3>';
+  var toc=el("ul","toc"); [["The Big Ones","3"],["Maze: Reindeer Run","5"],["Build + Invent","6"],["Word search","8"],["Make + Play","9"],["Little Kids","10"],["Color it in","11"],["Stocking Stuffers","12"],["Order form","13"]].forEach(function(r){var li=el("li"); li.appendChild(el("span",null,r[0])); li.appendChild(el("i")); li.appendChild(el("span",null,r[1])); toc.appendChild(li)});
+  b.appendChild(toc);
+  var c=el("div","belongs"); c.innerHTML='<h3>This book belongs to (write your name with a crayon)</h3><div class="line"></div>';
+  var d=el("div","coupon"); d.innerHTML='<h3>Sale bulletin, Thanksgiving week</h3>';
+  var ul=el("ul"); SALES.forEach(function(s){var li=el("li"); li.appendChild(el("span",null,s[0])); li.appendChild(el("span",null,s[1])); ul.appendChild(li)}); d.appendChild(ul);
+  var e=el("div"); e.style.background="var(--slate)"; e.innerHTML='<h3>For grown-ups</h3><p>Sale items wear a pink SALE flag and list the regular price. Prices were spotted November 26, 2026 and move fast this week.</p><p>The order form has a button for each store. It opens a search for that toy.</p>';
+  w.appendChild(a); w.appendChild(b); w.appendChild(c); w.appendChild(d); w.appendChild(e);
+  pg.appendChild(w); f.appendChild(pg);
+}
+function catalogPage(sec,items,tpl,first,fig0){
+  return function(f,pno){
+    var pg=el("div","pg"), g=el("div","grid");
+    items.forEach(function(it,i){
+      var t=T[tpl][i], cw=t[1]-t[0], rh=t[3]-t[2];
+      itemNo++; it.no=itemNo; it.id="n"+itemNo; it.page=pno+1; ITEMS[it.id]=it;
+      var p=el("section","panel"+(cw>=4?" wide":"")+(cw>=4&&rh>=5?" hero":"")); p.dataset.id=it.id;
+      p.style.gridColumn=t[0]+"/"+t[1]; p.style.gridRow=t[2]+"/"+t[3]; p.style.setProperty("--bg",BGS[(i+pno)%BGS.length]); p.style.setProperty("--i",i);
+      var head=null; if(first&&i===0){head=el("h2","sect",sec.title); head.appendChild(el("small",null,sec.blurb)); if(!(cw>=4&&rh<5)){p.appendChild(head); head=null}}
+      var fig=("0"+(fig0+i+1)).slice(-2), well=el("div","well"); well.dataset.ph=it.id; well.dataset.alt=it.n;
+      well.appendChild(el("span","fig",fig));
+      if(it.was) well.appendChild(el("span","flag","Sale"));
+      if(PHOTOS[it.no]){var im=el("img"); im.src=PHOTOS[it.no]; im.alt=it.n; im.draggable=false; well.appendChild(im);}
+      else{well.classList.add("fpo"); well.appendChild(el("span","num",fig)); well.appendChild(el("em",null,"photo "+it.no));}
+      p.appendChild(well);
+      var c=el("div","copy"); if(head){head.style.marginBottom="8px"; c.appendChild(head); c.style.alignSelf="stretch"; c.style.display="flex"; c.style.flexDirection="column"; var sp=el("div"); sp.style.flex="1"; var inner=el("div"); c.appendChild(sp); c.appendChild(inner); c._in=inner}
+      var cc=c._in||c;
+      cc.appendChild(el("b",null,(it.nw?"New! ":"")+it.n+". "));
+      cc.appendChild(document.createTextNode(it.d+(it.age?" Ages "+it.age+".":"")+" Spotted at "+it.at+"."));
+      if(it.was) cc.appendChild(el("span","sv","Sale! Save $"+cents(it.was-it.p).replace(/\.00$/,"")+". Reg. "+cents(it.was)+"."));
+      var pl=el("div","pl"); pl.appendChild(el("span",null,"WB "+it.no+" A")); pl.appendChild(el("i")); pl.appendChild(el("span",null,it.pl||cents(it.p))); cc.appendChild(pl);
+      p.appendChild(c); g.appendChild(p);
+    });
+    pg.appendChild(g); f.appendChild(pg);
+    f.appendChild(el("div","foot","Prices spotted Nov. 26, 2026 and can change. Photo numbers match the little black tags."));
+    f.appendChild(el("div","folio","toys "+(pno+1)));
+  };
+}
+function buildMaze(f,pno){
+  var a=el("div","act"); a.style.setProperty("--abg","#F8E27A");
+  a.innerHTML='<h2>Reindeer <span>Run</span></h2><p class="dek">The reindeer wandered off. Draw a crayon line from START to the SLEIGH without crossing a wall.</p>';
+  var sh=el("div","sheet"), again=el("button","again","New maze"); again.type="button";
+  a.appendChild(sh); a.appendChild(again); f.appendChild(a); f.appendChild(el("div","folio","toys "+(pno+1)));
+  function draw(){
+    var N=12, c=38, W=N*c, r=rng(S.seed*9973+11), g=[], i;
+    for(i=0;i<N*N;i++) g.push({w:[1,1,1,1],v:0});
+    var st=[0], D=[[0,-1,0,2],[1,0,1,3],[0,1,2,0],[-1,0,3,1]]; g[0].v=1;
+    while(st.length){var cur=st[st.length-1], x=cur%N, y=(cur-x)/N, o=[];
+      D.forEach(function(d){var nx=x+d[0],ny=y+d[1]; if(nx>=0&&ny>=0&&nx<N&&ny<N&&!g[ny*N+nx].v) o.push(d)});
+      if(!o.length){st.pop();continue} var d=o[Math.floor(r()*o.length)], ni=(y+d[1])*N+x+d[0]; g[cur].w[d[2]]=0; g[ni].w[d[3]]=0; g[ni].v=1; st.push(ni);}
+    g[0].w[0]=0; g[N*N-1].w[2]=0;
+    var path="";
+    for(var yy=0;yy<N;yy++)for(var xx=0;xx<N;xx++){var w=g[yy*N+xx].w,X=xx*c,Y=yy*c+30;
+      if(w[0]) path+="M"+X+" "+Y+"h"+c; if(w[3]) path+="M"+X+" "+Y+"v"+c; if(xx===N-1&&w[1]) path+="M"+(X+c)+" "+Y+"v"+c; if(yy===N-1&&w[2]) path+="M"+X+" "+(Y+c)+"h"+c;}
+    var svg=svgEl("svg",{viewBox:"-4 0 "+(W+8)+" "+(W+60),role:"img","aria-label":"Maze"});
+    svg.appendChild(svgEl("path",{d:path,fill:"none",stroke:"#14213A","stroke-width":4,"stroke-linecap":"square"}));
+    var t1=svgEl("text",{x:0,y:20,"text-anchor":"start","font-family":"Archivo,Arial","font-weight":800,"font-size":15,fill:"#D4145A"}); t1.textContent="START";
+    var t2=svgEl("text",{x:W-c/2-10,y:W+52,"text-anchor":"middle","font-family":"Archivo,Arial","font-weight":800,"font-size":15,fill:"#D4145A"}); t2.textContent="SLEIGH";
+    svg.appendChild(t1); svg.appendChild(t2); sh.textContent=""; sh.appendChild(svg);
+  }
+  again.addEventListener("click",function(){S.seed=(S.seed||7)+1; wipe([pno]); draw(); save()});
+  draw();
+}
+function buildWords(f,pno){
+  var WORDS=["SLEIGH","MITTEN","TINSEL","COCOA","CAROL","GIFT","STAR","SNOW","NANA","ELF"], N=11, r=rng(1998), g=[], i;
+  for(i=0;i<N*N;i++) g.push("");
+  var dirs=[[1,0],[0,1],[1,1]];
+  WORDS.forEach(function(w){for(var tries=0;tries<400;tries++){var d=dirs[Math.floor(r()*3)], x=Math.floor(r()*(N-d[0]*(w.length-1))), y=Math.floor(r()*(N-d[1]*(w.length-1))), ok=true, j;
+    for(j=0;j<w.length;j++){var c=g[(y+d[1]*j)*N+x+d[0]*j]; if(c&&c!==w[j]){ok=false;break}}
+    if(ok){for(j=0;j<w.length;j++) g[(y+d[1]*j)*N+x+d[0]*j]=w[j]; break}}});
+  for(i=0;i<N*N;i++) if(!g[i]) g[i]="ABCDEFGHIKLMNOPRSTUWY"[Math.floor(r()*21)];
+  var a=el("div","act"); a.style.setProperty("--abg","#8FD0C6");
+  a.innerHTML='<h2>Word <span>Hunt</span></h2><p class="dek">Ten holiday words are hiding across, down and slanted. Circle each one, then cross it off the list.</p>';
+  var sh=el("div","sheet"), ws=el("div","ws"); g.forEach(function(ch){ws.appendChild(el("span",null,ch))}); sh.appendChild(ws); a.appendChild(sh);
+  var ul=el("ul","words"); WORDS.forEach(function(w){ul.appendChild(el("li",null,w))}); a.appendChild(ul);
+  f.appendChild(a); f.appendChild(el("div","folio","toys "+(pno+1)));
+}
+function buildColor(f,pno){
+  var a=el("div","act"); a.style.setProperty("--abg","#B9B6DC");
+  a.innerHTML='<h2>Color <span>It In</span></h2><p class="dek">This tree showed up plain. Fix that. Use every crayon in the box.</p>'+
+  '<div class="sheet"><svg viewBox="0 0 500 560" role="img" aria-label="Coloring page: a Christmas tree with presents and a snowman" fill="none" stroke="#14213A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">'+
+  '<path d="M250 40 L262 74 L298 76 L270 98 L280 132 L250 112 L220 132 L230 98 L202 76 L238 74 Z"/>'+
+  '<path d="M250 118 L330 220 L296 214 L370 320 L326 312 L404 430 L96 430 L174 312 L130 320 L204 214 L170 220 Z"/>'+
+  '<rect x="226" y="430" width="48" height="52"/>'+
+  '<circle cx="232" cy="200" r="13"/><circle cx="286" cy="262" r="15"/><circle cx="206" cy="290" r="14"/><circle cx="262" cy="350" r="16"/><circle cx="166" cy="388" r="15"/><circle cx="336" cy="386" r="15"/><circle cx="226" cy="400" r="11"/>'+
+  '<path d="M196 246 Q250 280 306 232 M150 350 Q250 410 356 344"/>'+
+  '<rect x="40" y="436" width="110" height="84"/><path d="M95 436 V520 M40 474 H150 M95 436 C70 404 52 424 95 436 C138 424 120 404 95 436"/>'+
+  '<rect x="300" y="456" width="74" height="64"/><path d="M337 456 V520 M300 486 H374"/>'+
+  '<circle cx="436" cy="470" r="44"/><circle cx="436" cy="398" r="30"/><path d="M412 372 H460 M420 372 V338 H452 V372"/><circle cx="426" cy="392" r="3"/><circle cx="446" cy="392" r="3"/><path d="M436 402 L458 408 L436 412"/><circle cx="436" cy="452" r="4"/><circle cx="436" cy="474" r="4"/><circle cx="436" cy="496" r="4"/>'+
+  '<path d="M10 520 H490"/><path d="M60 80 l0 24 M48 92 l24 0 M52 84 l16 16 M68 84 l-16 16 M420 150 l0 24 M408 162 l24 0 M412 154 l16 16 M428 154 l-16 16 M110 220 l0 18 M101 229 l18 0"/>'+
+  '</svg></div>';
+  f.appendChild(a); f.appendChild(el("div","folio","toys "+(pno+1)));
+}
+function buildOrder(f,pno){
+  var o=el("div","order");
+  o.innerHTML='<h2>Wish Order Form <small>Page '+(pno+1)+'</small></h2>'+
+   '<div class="fields"><label for="kidname">Ordered by<input id="kidname" type="text" maxlength="24" autocomplete="off" placeholder="your name"></label><label for="dear">Send this list to<input id="dear" type="text" maxlength="20" autocomplete="off"></label></div>'+
+   '<div class="tablewrap"><table><colgroup><col style="width:9%"><col style="width:19%"><col><col style="width:13%"><col style="width:19%"></colgroup><thead><tr><th>Pg.</th><th>Item no.</th><th>Description</th><th>Reg.</th><th>Price</th></tr></thead><tbody id="rows"></tbody></table></div>'+
+   '<div class="find" id="find"><span id="findTxt">Nothing marked yet. Flip back and circle the toys you love. They show up here.</span></div>'+
+   '<div class="sum"><span id="sumTxt">Merchandise total</span><output id="total">$0</output><button type="button" class="obtn" id="copyBtn">Copy the list</button></div>'+
+   '<textarea id="copyout" readonly aria-label="Wish list text to copy"></textarea>'+
+   '<p class="fine" id="copied" role="status">Tap a line to shop for that toy. Prices spotted Nov. 26, 2026. Check the store before you buy.</p>';
+  f.appendChild(o);
+}
+function buildBack(f){
+  var b=el("div","backc");
+  b.innerHTML='<div class="key"></div><h2>Wish books are for circling.</h2>'+
+   '<p>For grown-ups: every price and sale in this book was spotted on November 26, 2026. They change fast this week, so check the store before you buy. Store buttons on the order form open a search for that toy at Amazon, Target or Walmart.</p>'+
+   '<p>Crayon marks are saved on this iPad only.</p><button type="button" id="resetBtn">Erase every page and start over</button>';
+  f.appendChild(b);
+}
+// page order: cover, intro, big A, big B, maze, build A, build B, words, make, little, color, stuffers, order, back
+addPage(buildCover,{nodraw:1});
+addPage(buildIntro);
+addPage(catalogPage(SECTIONS[0],SECTIONS[0].items.slice(0,6),"a6",true,0));
+addPage(catalogPage(SECTIONS[0],SECTIONS[0].items.slice(6),"b6",false,6));
+addPage(buildMaze);
+addPage(catalogPage(SECTIONS[1],SECTIONS[1].items.slice(0,6),"b6",true,0));
+addPage(catalogPage(SECTIONS[1],SECTIONS[1].items.slice(6),"a6",false,6));
+addPage(buildWords);
+addPage(catalogPage(SECTIONS[2],SECTIONS[2].items,"a8",true,0));
+addPage(catalogPage(SECTIONS[3],SECTIONS[3].items,"b8",true,0));
+addPage(buildColor);
+addPage(catalogPage(SECTIONS[4],SECTIONS[4].items,"a9",true,0));
+addPage(buildOrder,{nodraw:1});
+addPage(buildBack,{nodraw:1});
+var ORDER_PAGE=12, LAST=PAGES.length-1, N=PAGES.length/2;
+
+/* ---------- build the book ---------- */
+var book=$("book"), stage=$("stage"), leaves=[], FACES=[], CV=[], CTX=[];
+for(var li=0;li<N;li++){
+  var leaf=el("div","leaf");
+  [0,1].forEach(function(side){
+    var pno=li*2+side, f=el("div","face "+(side?"back":"front")); f.dataset.p=pno;
+    FACES[pno]=f; leaf.appendChild(f);
+    PAGES[pno].build(f,pno);
+    if(PAGES[pno].draw){
+      var cv=el("canvas","ink"); cv.width=PW*RES; cv.height=PH*RES; cv.setAttribute("aria-hidden","true"); f.appendChild(cv);
+      CV[pno]=cv; CTX[pno]=cv.getContext("2d"); CTX[pno].setTransform(RES,0,0,RES,0,0); bindDraw(cv,pno);
+    }
+    if(pno>0&&pno<LAST){var fold=el("button","fold"); fold.type="button"; fold.setAttribute("aria-label",side?"Turn back a page":"Turn to the next page"); fold.addEventListener("click",function(){go(side?-1:1)}); f.appendChild(fold);}
+  });
+  book.appendChild(leaf); leaves.push({el:leaf,flipped:false});
+}
+
+/* ---------- navigation ---------- */
+var cur=0, page=0, viewPref=null;
+function isSpread(){ if(viewPref!==null) return viewPref; return stage.clientWidth/stage.clientHeight>1.2 && stage.clientWidth>=760 }
+function zfix(L,k){L.el.style.zIndex=L.flipped?(k+1):(N-k)}
+function layout(){
+  var W=stage.clientWidth, H=stage.clientHeight, two=isSpread(), m=W<560?8:50;
+  var s=Math.min((W-2*m)/((two?2:1)*PW),(H-18)/PH), cx=W/2, top=(H-PH*s)/2, left;
+  if(two){left=cx-PW*s; if(cur===0) left-=PW*s/2; if(cur===N) left+=PW*s/2;}
+  else left=(page%2===0)?cx-1.5*PW*s:cx-0.5*PW*s;
+  book.style.transform="translate("+left.toFixed(1)+"px,"+top.toFixed(1)+"px) scale("+s.toFixed(4)+")";
+  $("viewBtn").textContent=two?"1 page":"2 pages";
+}
+function visiblePages(){ if(!isSpread()) return [page]; var v=[]; if(cur>0) v.push(2*cur-1); if(cur<N) v.push(2*cur); return v }
+function show(instant){
+  leaves.forEach(function(L,k){
+    var f=k<cur;
+    if(L.flipped!==f){
+      L.flipped=f; L.el.classList.toggle("flipped",f);
+      if(instant||reduce){zfix(L,k)}
+      else{L.el.classList.add("turning"); L.el.style.zIndex=200+k; (function(L,k){setTimeout(function(){L.el.classList.remove("turning"); zfix(L,k)},FLIP)})(L,k);}
+    } else if(!L.el.classList.contains("turning")) zfix(L,k);
+  });
+  stage.classList.toggle("closed",page===0);
+  layout();
+  FACES.forEach(function(f){f.classList.remove("arrive")});
+  if(!instant) visiblePages().forEach(function(p){void FACES[p].offsetWidth; FACES[p].classList.add("arrive")});
+  $("prev").disabled=$("prevBtn").disabled=page===0||(isSpread()&&cur===0);
+  $("next").disabled=$("nextBtn").disabled=isSpread()?cur===N:page===LAST;
+  try{history.replaceState(null,"","#p"+(page+1))}catch(e){}
+}
+function goTo(p,instant){
+  page=Math.max(0,Math.min(LAST,p)); cur=Math.ceil(page/2);
+  if(isSpread()) page=cur===N?LAST:2*cur;
+  if(page===ORDER_PAGE||(isSpread()&&cur===ORDER_PAGE/2)) renderOrder();
+  show(instant);
+}
+function go(dir){
+  if(isSpread()){var c=Math.max(0,Math.min(N,cur+dir)); goTo(c===N?LAST:2*c)}
+  else goTo(page+dir);
+}
+$("prev").addEventListener("click",function(){go(-1)}); $("next").addEventListener("click",function(){go(1)});
+$("prevBtn").addEventListener("click",function(){go(-1)}); $("nextBtn").addEventListener("click",function(){go(1)});
+$("viewBtn").addEventListener("click",function(){viewPref=!isSpread(); goTo(page,true)});
+$("wishBtn").addEventListener("click",function(){goTo(ORDER_PAGE)});
+document.addEventListener("keydown",function(e){ if(e.target.tagName==="INPUT") return; if(e.key==="ArrowRight") go(1); if(e.key==="ArrowLeft") go(-1); if((e.metaKey||e.ctrlKey)&&e.key==="z"){e.preventDefault(); undo()} });
+function fitTools(){document.body.classList.toggle("bar",!(window.innerWidth>=900&&window.innerHeight>=640))}
+var rzT; window.addEventListener("resize",function(){clearTimeout(rzT); rzT=setTimeout(function(){fitTools(); goTo(page,true)},120)});
+// cover parallax: layers drift with the pointer while the book is closed
+stage.addEventListener("pointermove",function(e){ if(page!==0||reduce) return; var c=$("cover"), r=stage.getBoundingClientRect(); c.style.setProperty("--mx",((e.clientX-r.left)/r.width*2-1).toFixed(3)); c.style.setProperty("--my",((e.clientY-r.top)/r.height*2-1).toFixed(3)); });
+
+/* ---------- crayon engine ---------- */
+var PAT={};
+function wax(color){
+  if(PAT[color]) return PAT[color];
+  var c=document.createElement("canvas"); c.width=c.height=128; var x=c.getContext("2d"), r=rng(color.charCodeAt(1)*31+color.charCodeAt(3)), i;
+  x.fillStyle=color; x.fillRect(0,0,128,128);
+  for(i=0;i<1500;i++){x.clearRect(r()*128,r()*128,1+r()*2.2,1+r()*1.6)}
+  x.globalAlpha=.25; x.fillStyle="#fff"; for(i=0;i<500;i++){x.fillRect(r()*128,r()*128,2+r()*3,1)}
+  return PAT[color]=x.createPattern(c,"repeat");
+}
+function shapePath(ctx,shape,x,y,sz){
+  var toks=SHAPES[shape].match(/[MLCZ]|-?[\d.]+/g), i=0, n=function(){return parseFloat(toks[i++])};
+  ctx.beginPath();
+  while(i<toks.length){var t=toks[i++];
+    if(t==="M") ctx.moveTo(x+n()*sz,y+n()*sz); else if(t==="L") ctx.lineTo(x+n()*sz,y+n()*sz);
+    else if(t==="C") ctx.bezierCurveTo(x+n()*sz,y+n()*sz,x+n()*sz,y+n()*sz,x+n()*sz,y+n()*sz); else ctx.closePath();}
+}
+function piece(ctx,P,i){ // draws the smoothed bit of the stroke that point i completes
+  var x0=P[2*i-2],y0=P[2*i-1],x1=P[2*i],y1=P[2*i+1];
+  if(i===1){ctx.moveTo(x0,y0); ctx.lineTo((x0+x1)/2,(y0+y1)/2)}
+  else{var xa=P[2*i-4],ya=P[2*i-3]; ctx.moveTo((xa+x0)/2,(ya+y0)/2); ctx.quadraticCurveTo(x0,y0,(x0+x1)/2,(y0+y1)/2)}
+}
+function style(ctx,s){ctx.lineCap=ctx.lineJoin="round"; ctx.lineWidth=s.t==="m"?s.w*1.9:s.w; ctx.strokeStyle=ctx.fillStyle=s.t==="m"?s.c:wax(s.c)}
+function paint(ctx,s){
+  style(ctx,s);
+  if(s.t==="s"){shapePath(ctx,s.sh,s.p[0],s.p[1],s.w*2.4); ctx.fill(); return}
+  var P=s.p, n=P.length/2;
+  if(n===1){ctx.beginPath(); ctx.arc(P[0],P[1],ctx.lineWidth/2,0,6.3); ctx.fill(); return}
+  ctx.beginPath(); for(var i=1;i<n;i++) piece(ctx,P,i);
+  ctx.moveTo((P[2*n-4]+P[2*n-2])/2,(P[2*n-3]+P[2*n-1])/2); ctx.lineTo(P[2*n-2],P[2*n-1]); ctx.stroke();
+}
+function redraw(p){var ctx=CTX[p]; if(!ctx) return; ctx.clearRect(0,0,PW,PH); (S.strokes[p]||[]).forEach(function(s){paint(ctx,s)})}
+var UNDO=[];
+function pushUndo(u){UNDO.push(u); if(UNDO.length>80) UNDO.shift()}
+function undo(){
+  var u=UNDO.pop(); if(!u) return;
+  if(u.k==="add"){var a=S.strokes[u.p]||[], i=a.indexOf(u.s); if(i>=0) a.splice(i,1); changed(u.p)}
+  else{u.list.forEach(function(d){(S.strokes[d.p]=S.strokes[d.p]||[]).splice(Math.min(d.i,S.strokes[d.p].length),0,d.s)}); u.pages.forEach(changed)}
+}
+function changed(p){redraw(p); remark(p); save()}
+function wipe(pages){
+  var list=[]; pages.forEach(function(p){(S.strokes[p]||[]).forEach(function(s,i){list.push({p:p,i:i,s:s})}); S.strokes[p]=[]});
+  if(list.length) pushUndo({k:"del",list:list,pages:pages.slice()});
+  pages.forEach(changed);
+}
+function bindDraw(cv,p){
+  var active=null, s=null, erased=null;
+  function pt(e){var r=cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/r.width*PW*10)/10, Math.round((e.clientY-r.top)/r.height*PH*10)/10]}
+  function erase(q){
+    var a=S.strokes[p]||[], rad=S.size+8, hit=false;
+    for(var i=a.length-1;i>=0;i--){var st=a[i], P=st.p, lim=st.t==="s"?st.w*2.4+rad:rad+st.w/2, near=false;
+      for(var j=0;j<P.length;j+=2){var dx=P[j]-q[0],dy=P[j+1]-q[1]; if(dx*dx+dy*dy<lim*lim){near=true;break}}
+      if(near){erased.push({p:p,i:i,s:st}); a.splice(i,1); hit=true}}
+    if(hit) redraw(p);
+  }
+  cv.addEventListener("pointerdown",function(e){
+    if(active!==null||(e.pointerType==="mouse"&&e.button!==0)) return;
+    active=e.pointerId; try{cv.setPointerCapture(e.pointerId)}catch(x){}
+    var q=pt(e), ctx=CTX[p]; e.preventDefault();
+    if(S.tool==="e"){erased=[]; erase(q); return}
+    if(S.tool==="s"){s={t:"s",c:S.color,w:S.size,sh:S.shape,p:q}; (S.strokes[p]=S.strokes[p]||[]).push(s); paint(ctx,s); pushUndo({k:"add",p:p,s:s}); s=null; remark(p); save(); return}
+    s={t:S.tool,c:S.color,w:S.size,p:q}; (S.strokes[p]=S.strokes[p]||[]).push(s);
+    style(ctx,s); ctx.beginPath(); ctx.arc(q[0],q[1],ctx.lineWidth/2,0,6.3); ctx.fill();
+  });
+  cv.addEventListener("pointermove",function(e){
+    if(e.pointerId!==active) return;
+    var evs=e.getCoalescedEvents?e.getCoalescedEvents():[e]; if(!evs.length) evs=[e];
+    if(S.tool==="e"&&erased){erase(pt(e)); return}
+    if(!s) return; var ctx=CTX[p], P=s.p; style(ctx,s);
+    evs.forEach(function(ev){var q=pt(ev), n=P.length; if(Math.abs(q[0]-P[n-2])+Math.abs(q[1]-P[n-1])<1.2) return; P.push(q[0],q[1]); ctx.beginPath(); piece(ctx,P,P.length/2-1); ctx.stroke()});
+  });
+  function end(e){
+    if(e.pointerId!==active) return; active=null;
+    if(erased){ if(erased.length){pushUndo({k:"del",list:erased.slice().reverse(),pages:[p]}); remark(p); save()} erased=null; return }
+    if(s){var P=s.p, n=P.length; if(n>=4){var ctx=CTX[p]; style(ctx,s); ctx.beginPath(); ctx.moveTo((P[n-4]+P[n-2])/2,(P[n-3]+P[n-1])/2); ctx.lineTo(P[n-2],P[n-1]); ctx.stroke()} pushUndo({k:"add",p:p,s:s}); s=null; remark(p); save()}
+  }
+  cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end);
+}
+
+/* ---------- which toys got marked ---------- */
+var MARKS={};
+function inPoly(x,y,P){var c=false; for(var i=0,j=P.length-2;i<P.length;j=i,i+=2){if((P[i+1]>y)!==(P[j+1]>y)&&x<(P[j]-P[i])*(y-P[i+1])/(P[j+1]-P[i+1])+P[i]) c=!c} return c}
+function remark(p){
+  var panels=FACES[p].querySelectorAll(".panel"), out={}; if(!panels.length){MARKS[p]={}; return}
+  var R=[].map.call(panels,function(el){return {id:el.dataset.id,x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}});
+  (S.strokes[p]||[]).forEach(function(s){
+    var P=s.p;
+    if(s.t==="s"){R.forEach(function(r){if(P[0]>=r.x&&P[0]<=r.x+r.w&&P[1]>=r.y&&P[1]<=r.y+r.h) out[r.id]=1}); return}
+    var n=P.length/2, x0=1e9,y0=1e9,x1=-1e9,y1=-1e9, i;
+    for(i=0;i<n;i++){x0=Math.min(x0,P[2*i]);x1=Math.max(x1,P[2*i]);y0=Math.min(y0,P[2*i+1]);y1=Math.max(y1,P[2*i+1])}
+    var diag=Math.hypot(x1-x0,y1-y0), gap=Math.hypot(P[0]-P[2*n-2],P[1]-P[2*n-1]), got=false;
+    if(n>8&&diag>50&&gap<diag*0.5) R.forEach(function(r){if(inPoly(r.x+r.w/2,r.y+r.h/2,P)){out[r.id]=1; got=true}});
+    if(got) return;
+    var best=null, bl=0;
+    R.forEach(function(r){var len=0; for(i=1;i<n;i++){var mx=(P[2*i]+P[2*i-2])/2,my=(P[2*i+1]+P[2*i-1])/2; if(mx>=r.x&&mx<=r.x+r.w&&my>=r.y&&my<=r.y+r.h) len+=Math.hypot(P[2*i]-P[2*i-2],P[2*i+1]-P[2*i-1])} if(len>bl){bl=len;best=r}});
+    if(best&&bl>=Math.min(best.w,best.h)*0.3) out[best.id]=1;
+  });
+  MARKS[p]=out; var c=marked().length; $("count").textContent=c;
+  if(page===ORDER_PAGE||(isSpread()&&cur===ORDER_PAGE/2)) renderOrder();
+}
+function marked(){var ids=[]; for(var p in MARKS) for(var id in MARKS[p]) if(ITEMS[id]) ids.push(id); return ids.sort()}
+
+/* ---------- order form ---------- */
+var selId=null;
+function shopLinks(name,link){var q=encodeURIComponent(name); return [["Amazon",link||"https://www.amazon.com/s?k="+q],["Target","https://www.target.com/s?searchTerm="+q],["Walmart","https://www.walmart.com/search?q="+q]]}
+function renderOrder(){
+  var ids=marked(), tb=$("rows"), total=0; if(!tb) return; tb.textContent="";
+  if(ids.indexOf(selId)<0) selId=ids[0]||null;
+  ids.forEach(function(id){var it=ITEMS[id]; total+=it.p;
+    var tr=el("tr",id===selId?"sel":null); tr.tabIndex=0;
+    tr.appendChild(el("td",null,it.page)); tr.appendChild(el("td",null,"WB "+it.no+" A")); tr.appendChild(el("td",null,it.n)); tr.appendChild(el("td","was",it.was?cents(it.was):"")); tr.appendChild(el("td",null,it.pl||cents(it.p)));
+    function pick(){selId=id; renderOrder()} tr.addEventListener("click",pick); tr.addEventListener("keydown",function(e){if(e.key==="Enter") pick()});
+    tb.appendChild(tr)});
+  for(var i=ids.length;i<15;i++){var tr=el("tr"); for(var j=0;j<5;j++) tr.appendChild(el("td")); tr.style.cursor="default"; tb.appendChild(tr)}
+  var find=$("find"); find.textContent="";
+  if(selId){var it=ITEMS[selId]; find.appendChild(el("span",null,"Find "+it.n+" at:")); shopLinks(it.n,it.link).forEach(function(l){var a=el("a",null,l[0]); a.href=l[1]; a.target="_blank"; a.rel="noopener noreferrer"; find.appendChild(a)})}
+  else find.appendChild(el("span",null,"Nothing marked yet. Flip back and circle the toys you love. They show up here."));
+  $("sumTxt").textContent=ids.length+(ids.length===1?" wish. ":" wishes. ")+"Total, about";
+  $("total").textContent="$"+Math.round(total);
+  $("copyBtn").style.visibility=ids.length?"visible":"hidden";
+}
+function listText(){
+  var out=["Dear "+(S.dear||"Nana")+",","",(S.name?S.name+"'s":"My")+" wish list from The Big Wish Book 2026:",""];
+  marked().forEach(function(id,i){var it=ITEMS[id]; out.push((i+1)+". "+it.n+", $"+(it.pl||cents(it.p))+(it.was?" (reg. $"+cents(it.was)+")":"")+", spotted at "+it.at); out.push("   "+shopLinks(it.n,it.link)[0][1])});
+  return out.join("\n");
+}
+$("copyBtn").addEventListener("click",function(){
+  var t=listText(), ok=function(){$("copied").textContent="Copied. Paste it into a text or an email."}, fail=function(){var o=$("copyout"); o.style.display="block"; o.value=t; o.focus(); o.select(); $("copied").textContent="Select the text above and copy it."};
+  try{navigator.clipboard.writeText(t).then(ok,fail)}catch(e){fail()}
+});
+var kn=$("kidname"), dr=$("dear"); kn.value=S.name||""; dr.value=S.dear||"Nana";
+kn.addEventListener("input",function(){S.name=kn.value.trim(); save()}); dr.addEventListener("input",function(){S.dear=dr.value.trim(); save()});
+var armed=false; $("resetBtn").addEventListener("click",function(){
+  if(!armed){armed=true; this.textContent="Tap again to erase everything"; var b=this; setTimeout(function(){armed=false; b.textContent="Erase every page and start over"},4000); return}
+  armed=false; this.textContent="Erase every page and start over"; var pages=[]; for(var p in S.strokes) pages.push(+p); S.strokes={}; UNDO=[]; pages.forEach(changed); goTo(0);
+});
+
+/* ---------- toolbox ---------- */
+function press(group,match){[].forEach.call(group.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",match(b)?"true":"false")})}
+COLORS.forEach(function(c){var b=el("button","sw"); b.type="button"; b.style.setProperty("--c",c[1]); b.dataset.c=c[1]; b.setAttribute("aria-label",c[0]); b.addEventListener("click",function(){S.color=c[1]; if(S.tool==="e") setTool("c"); syncTools(); save()}); $("colors").appendChild(b)});
+SIZES.forEach(function(z,i){var b=el("button","tb"); b.type="button"; b.dataset.z=z; b.setAttribute("aria-label",["Thin","Medium","Fat"][i]+" tip"); var d=el("span","dot"); d.style.width=d.style.height=(5+i*7)+"px"; b.appendChild(d); b.addEventListener("click",function(){S.size=z; syncTools(); save()}); $("sizes").appendChild(b)});
+Object.keys(SHAPES).forEach(function(sh){var b=el("button","tb"); b.type="button"; b.dataset.sh=sh; b.setAttribute("aria-label",sh+" stamp"); var sv=svgEl("svg",{viewBox:"-1.2 -1.2 2.4 2.4","aria-hidden":"true"}); sv.appendChild(svgEl("path",{d:SHAPES[sh],fill:"#000"})); b.appendChild(sv); b.addEventListener("click",function(){S.shape=sh; setTool("s"); save()}); $("stamps").appendChild(b)});
+function setTool(t){S.tool=t; syncTools()}
+function syncTools(){
+  press($("toolGrp"),function(b){return b.dataset.tool===S.tool}); press($("colors"),function(b){return b.dataset.c===S.color});
+  press($("sizes"),function(b){return +b.dataset.z===S.size}); press($("stamps"),function(b){return S.tool==="s"&&b.dataset.sh===S.shape});
+}
+[].forEach.call($("toolGrp").querySelectorAll("button"),function(b){b.addEventListener("click",function(){setTool(b.dataset.tool); save()})});
+$("undoBtn").addEventListener("click",undo);
+$("wipeBtn").addEventListener("click",function(){wipe(visiblePages().filter(function(p){return CTX[p]}))});
+
+
+/* ---------- real toy photos: whoever can edit this page taps a slot and picks a picture from their device ---------- */
+var DBX=null, ASSETS=null, LIVE={}, pickKey=null, picker=el("input"); picker.type="file"; picker.accept="image/*"; picker.id="photoPick"; picker.style.display="none"; document.body.appendChild(picker);
+function note(t){$("photoMsg").textContent=t}
+function setPhoto(key,url){
+  [].forEach.call(document.querySelectorAll("[data-ph]"),function(w){
+    if(w.dataset.ph!==key) return; var im=w.querySelector("img");
+    if(!im){im=el("img"); im.alt=w.dataset.alt||""; im.draggable=false; im.addEventListener("error",function(){im.remove(); w.classList.add("fpo")}); w.appendChild(im)}
+    w.classList.remove("fpo"); [].forEach.call(w.querySelectorAll(".num,em"),function(x){x.remove()}); im.src=url;
+  });
+}
+function shrink(file){ // downscale to a small JPEG on white, so cutouts sit on the panel color
+  return new Promise(function(res,rej){var u=URL.createObjectURL(file), im=new Image();
+    im.onload=function(){var k=Math.min(1,900/Math.max(im.naturalWidth,im.naturalHeight)), cv=document.createElement("canvas"); cv.width=Math.max(1,Math.round(im.naturalWidth*k)); cv.height=Math.max(1,Math.round(im.naturalHeight*k));
+      var x=cv.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,cv.width,cv.height); x.drawImage(im,0,0,cv.width,cv.height); URL.revokeObjectURL(u);
+      cv.toBlob(function(b){b?res(b):rej(new Error("encode"))},"image/jpeg",.86)};
+    im.onerror=function(){URL.revokeObjectURL(u); rej(new Error("That file is not a picture this page can read."))}; im.src=u});
+}
+document.addEventListener("click",function(e){
+  if(!document.body.classList.contains("photomode")) return; var w=e.target.closest&&e.target.closest("[data-ph]"); if(!w) return;
+  e.preventDefault(); e.stopPropagation(); pickKey=w.dataset.ph; picker.click();
+},true);
+picker.addEventListener("change",function(){
+  var f=picker.files&&picker.files[0], key=pickKey; picker.value=""; if(!f||!key||!ASSETS||!DBX) return; note("Saving photo...");
+  shrink(f).then(function(blob){return ASSETS.upload(blob,{type:"image/jpeg"})}).then(function(r){
+    var old=LIVE[key]; LIVE[key]=r.id; setPhoto(key,r.url);
+    return DBX.doc("photos/"+key).set({asset:r.id}).then(function(){ if(old&&old!==r.id) return ASSETS.delete(old).then(function(){},function(){}) });
+  }).then(function(){note("Photo saved. Tap another slot.")},function(err){
+    var c=err&&err.code; note(c==="too_large"?"That picture is too big.":c==="quota_or_state"?"Photo storage is full.":c==="rate_limited"?"Slow down a little, then try again.":(err&&!c&&err.message)||"That photo did not save. Try again.");
+  });
+});
+$("photoBtn").addEventListener("click",function(){var on=document.body.classList.toggle("photomode"); this.setAttribute("aria-pressed",on?"true":"false"); this.textContent=on?"Done adding":"Add photos"; note(on?"Tap any dashed photo slot.":"")});
+if(window.claude&&typeof window.claude.use==="function"){
+  window.claude.use("db").then(function(db){
+    if(!db) return null; DBX=db;
+    db.collection("photos").onSnapshot(function(snap){snap.docs.forEach(function(d){var v=d.data(); if(v&&typeof v.asset==="string"&&/^[A-Za-z0-9_-]{8,64}$/.test(v.asset)&&LIVE[d.id]!==v.asset){LIVE[d.id]=v.asset; setPhoto(d.id,"/_blob/"+v.asset)}})},function(){});
+    return window.claude.use("assets");
+  }).then(function(a){ if(a&&DBX){ASSETS=a; $("photoBtn").hidden=false} },function(){});
+}
+
+// Self-hosted copy: an optional photos.json beside this page maps a photo slot to a live image and a product link,
+// e.g. {"updated":"2026-11-27T05:00:00Z","items":{"n101":{"img":"https://...","link":"https://..."}}}. tools/amazon-photos.mjs writes it. Slots are n101 to n149, plus c1 (NeeDoh) and c5 (Jellycat) on the cover.
+fetch("photos.json",{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(f){
+  if(!f) return; var m=f.items||f, live=false;
+  if(f.updated&&Date.now()-Date.parse(f.updated)>24*3600*1000) return; // Amazon image links may be kept for a day at most
+  for(var k in m){var v=m[k]; if(!v) continue;
+    if(typeof v.img==="string"&&/^https:\/\//.test(v.img)){setPhoto(k,v.img); live=true}
+    if(typeof v.link==="string"&&/^https:\/\//.test(v.link)&&ITEMS[k]){ITEMS[k].link=v.link; live=true}}
+  if(live){var d=el("p",null,"As an Amazon Associate I earn from qualifying purchases. Certain content that appears on this site comes from Amazon. This content is provided 'as is' and is subject to change or removal at any time."); var bc=document.querySelector(".backc"); if(bc) bc.insertBefore(d,$("resetBtn"));
+    var fine=document.querySelector(".order .fine"); if(fine) fine.textContent+=" As an Amazon Associate I earn from qualifying purchases.";}
+  renderOrder();
+}).catch(function(){});
+
+/* ---------- start ---------- */
+fitTools(); syncTools();
+var m=/^#p(\d+)$/.exec(location.hash||""); goTo(m?+m[1]-1:0,true);
+function restore(){for(var p=0;p<PAGES.length;p++){ if(CTX[p]){redraw(p); remark(p)} } renderOrder()}
+restore(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(restore);
+})();
+</script>
+</body>
+</html>
