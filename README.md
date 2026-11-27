@@ -7,7 +7,7 @@
 - `v/`                 video files
 - `index.html`         the site itself (layout, colors, robot replies)
 - `brooklyn-bound/`     the subway car page, at bkmade.nyc/brooklyn-bound. Ads are the `ADS` list in its script.
-- `wish-book/`          The Big Wish Book, the flip-through toy catalog, at bkmade.nyc/wish-book. The toy list is `SECTIONS` at the top of its script. Cover photos are `wish-book/img/fam1.jpg` to `fam6.jpg`. Toy photos and product links come from an optional `wish-book/photos.json`.
+- `wish-book/`          The Big Wish Book, the flip-through toy catalog, at bkmade.nyc/wish-book. The toy list is `SECTIONS` at the top of its script. Cover photos are `wish-book/img/fam1.jpg` to `fam6.jpg`. Toy photos and product links come from `wish-book/photos.json`, which the "Wish Book toy photos" action rebuilds from Amazon twice a day using `wish-book/asins.json` (one line per toy slot).
 - `escape/index.html`  Escape, the fire escape window, at bkmade.nyc/escape. The list of things the pigeon brings back and her timing are at the top of its script.
 
 ## Add a diary entry (no graphics needed)
